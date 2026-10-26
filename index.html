@@ -336,97 +336,102 @@
             box-shadow: 0 3px 0 #9E8400, 0 4px 8px rgba(0,0,0,0.35);
             cursor: pointer;
         }
+
+        /* Smooth Deck Transition */
+        @keyframes deckFadeIn {
+            from { opacity: 0; transform: translateY(10px) scale(0.99); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .deck-panel {
+            animation: deckFadeIn 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+        }
     </style>
 </head>
-<body class="antialiased selection:bg-blue-600 selection:text-white pb-20">
+<body class="antialiased selection:bg-blue-600 selection:text-white min-h-screen flex flex-col justify-between pb-12">
 
-    <!-- TOP HARDWARE BAR (Tactile Switch Bar) -->
-    <header class="sticky top-3 z-50 max-w-7xl mx-auto px-4">
-        <div class="hardware-chassis px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
+    <!-- TOP HARDWARE BAR (Spacious Mode Switcher) -->
+    <header class="sticky top-4 z-50 max-w-6xl w-full mx-auto px-4 sm:px-6">
+        <div class="hardware-chassis px-5 py-3.5 flex flex-wrap items-center justify-between gap-4">
             <!-- Brand & LED Status -->
-            <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 rounded-2xl bg-[#18181B] flex items-center justify-center text-[#22C55E] font-pixel text-xl shadow-inner border-2 border-stone-700">
+            <div class="flex items-center space-x-3.5">
+                <div class="w-11 h-11 rounded-2xl bg-[#18181B] flex items-center justify-center text-[#22C55E] font-pixel text-2xl shadow-inner border-2 border-stone-700">
                     M_2.1
                 </div>
                 <div>
                     <div class="flex items-center space-x-2">
-                        <span class="font-black text-base tracking-tight text-zinc-900">AGICamp 模力工场</span>
-                        <span class="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full bg-emerald-100 border border-emerald-400 text-[11px] font-bold text-emerald-900">
+                        <span class="font-black text-base sm:text-lg tracking-tight text-zinc-900">AGICamp 模力揭榜</span>
+                        <span class="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-emerald-100 border border-emerald-400 text-[11px] font-extrabold text-emerald-900">
                             <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
-                            <span>V2.1 FDE_OS</span>
+                            <span>V2.1 极简工作台</span>
                         </span>
                     </div>
-                    <p class="text-[11px] font-bold text-stone-600">真问题出题 · 智囊团共议 · FDE×OPC入企落地</p>
+                    <p class="text-xs font-bold text-stone-500 mt-0.5">真问题出题 · 智囊团共议 · FDE×OPC入企</p>
                 </div>
             </div>
 
-            <!-- Quick Mechanical Jump Keys -->
-            <nav class="hidden xl:flex items-center space-x-1.5 text-xs font-extrabold">
-                <a href="#overview" onclick="playClick()" class="px-2.5 py-1.5 rounded-xl bg-white border-b-4 border-stone-300 hover:border-blue-500 active:translate-y-0.5 transition">01_9键总控</a>
-                <a href="#funnel-diorama" onclick="playClick()" class="px-2.5 py-1.5 rounded-xl bg-white border-b-4 border-stone-300 hover:border-blue-500 active:translate-y-0.5 transition">02_五阶微缩</a>
-                <a href="#scenarios" onclick="playClick()" class="px-2.5 py-1.5 rounded-xl bg-white border-b-4 border-stone-300 hover:border-blue-500 active:translate-y-0.5 transition">03_行业翻牌</a>
-                <a href="#calendar" onclick="playClick()" class="px-2.5 py-1.5 rounded-xl bg-white border-b-4 border-stone-300 hover:border-blue-500 active:translate-y-0.5 transition">04_档期合成</a>
-                <a href="#fde-opc" onclick="playClick()" class="px-2.5 py-1.5 rounded-xl bg-white border-b-4 border-stone-300 hover:border-blue-500 active:translate-y-0.5 transition">05_FDE通关</a>
-                <a href="#economics" onclick="playClick()" class="px-2.5 py-1.5 rounded-xl bg-white border-b-4 border-stone-300 hover:border-blue-500 active:translate-y-0.5 transition">06_盈亏调音</a>
-                <a href="#workbench" onclick="playClick()" class="px-2.5 py-1.5 rounded-xl bg-white border-b-4 border-stone-300 hover:border-blue-500 active:translate-y-0.5 transition">07_出票终端</a>
+            <!-- 5 Clean Deck Mode Switchers (Eliminates Vertical Crowding) -->
+            <nav class="flex flex-wrap items-center gap-2 text-xs font-black" id="deck-nav">
+                <button onclick="switchDeck('deck-1')" id="nav-deck-1" class="px-3.5 py-2 rounded-xl bg-[#1E78FF] text-white border-b-4 border-[#05358A] active:translate-y-0.5 transition">01 · 9键总控</button>
+                <button onclick="switchDeck('deck-2')" id="nav-deck-2" class="px-3.5 py-2 rounded-xl bg-white text-zinc-800 border-b-4 border-stone-300 hover:border-blue-500 active:translate-y-0.5 transition">02 · 行业翻牌</button>
+                <button onclick="switchDeck('deck-3')" id="nav-deck-3" class="px-3.5 py-2 rounded-xl bg-white text-zinc-800 border-b-4 border-stone-300 hover:border-blue-500 active:translate-y-0.5 transition">03 · 档期与FDE</button>
+                <button onclick="switchDeck('deck-4')" id="nav-deck-4" class="px-3.5 py-2 rounded-xl bg-white text-zinc-800 border-b-4 border-stone-300 hover:border-blue-500 active:translate-y-0.5 transition">04 · 盈亏调音</button>
+                <button onclick="switchDeck('deck-5')" id="nav-deck-5" class="px-3.5 py-2 rounded-xl bg-white text-zinc-800 border-b-4 border-stone-300 hover:border-blue-500 active:translate-y-0.5 transition">05 · 打票与评测</button>
             </nav>
 
-            <!-- Sound Toggle & Role Switcher -->
+            <!-- Sound & View All Toggle -->
             <div class="flex items-center space-x-2">
-                <span class="hidden md:inline-block text-[11px] font-pixel bg-stone-200 px-2 py-1 rounded-lg text-stone-700">支持键盘按 [1-9] 键触发</span>
-                <button onclick="toggleSound()" id="sound-btn" class="px-3 py-1.5 rounded-xl bg-stone-800 text-emerald-400 font-pixel text-sm border-b-4 border-black active:translate-y-0.5 transition flex items-center space-x-1.5" title="机械轴体音效开关">
+                <button onclick="toggleAllDecks()" id="all-decks-btn" class="px-3 py-2 rounded-xl bg-stone-200 text-stone-800 text-xs font-extrabold border-b-4 border-stone-400 active:translate-y-0.5 transition" title="切换单屏专注 / 全景长图">
+                    <span id="all-decks-label">展开长图</span>
+                </button>
+                <button onclick="toggleSound()" id="sound-btn" class="px-3 py-2 rounded-xl bg-stone-800 text-emerald-400 font-pixel text-sm border-b-4 border-black active:translate-y-0.5 transition flex items-center space-x-1.5" title="机械轴体音效开关">
                     <i class="fa-solid fa-volume-high" id="sound-icon"></i>
                     <span id="sound-label">SFX:ON</span>
-                </button>
-                <button onclick="scrollToSection('workbench')" class="px-3.5 py-1.5 rounded-xl bg-[#1E78FF] text-white text-xs font-extrabold border-b-4 border-[#05358A] active:translate-y-0.5 transition flex items-center space-x-1">
-                    <span>轻征题打票</span>
-                    <i class="fa-solid fa-print"></i>
                 </button>
             </div>
         </div>
     </header>
 
-    <!-- MAIN CONTENT CONTAINER -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-14">
+    <!-- MAIN WORKSTATION CONTAINER (Generous Breathing Room) -->
+    <main class="max-w-6xl w-full mx-auto px-4 sm:px-6 pt-8 sm:pt-10 flex-1 space-y-16">
 
         <!-- =========================================================================
-             HERO SECTION: REFERENCE 1 (RETRO 9-KEY MACRO PAD) + REFERENCE 2 (DIORAMA CARD)
+             DECK 01: HERO 9-KEY MACRO PAD (REF 1) + 5-STAGE DIORAMA CARD (REF 2)
              ========================================================================= -->
-        <section id="overview" class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start pt-2">
+        <section id="deck-1" class="deck-panel grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
 
             <!-- LEFT COLUMN (7 Cols): Reference 1 Tactile Macro-Pad Console -->
             <div class="lg:col-span-7 relative">
-                <!-- Left Side Hardware Bumpers (Interactive Randomizer & Volume) -->
-                <div onclick="randomMacroPress()" title="侧键：随机抽检一项核心机制" class="hidden sm:flex absolute -left-3 top-36 side-bumper-blue cursor-pointer active:translate-x-1 transition items-center justify-center text-white text-[10px] font-pixel">R</div>
+                <!-- Left Side Hardware Bumpers -->
+                <div onclick="randomMacroPress()" title="侧键：随机抽检一项核心机制" class="hidden sm:flex absolute -left-3.5 top-36 side-bumper-blue cursor-pointer active:translate-x-1 transition items-center justify-center text-white text-[10px] font-pixel">R</div>
                 <div onclick="rotateRoleKnob()" title="滚轮：切换阅读角色" class="hidden sm:block absolute -left-5 top-64 side-knurled-wheel cursor-pointer active:translate-x-1 transition"></div>
 
-                <div class="hardware-chassis p-5 sm:p-8 relative">
+                <div class="hardware-chassis p-6 sm:p-9 relative">
                     <!-- Top Row: OLED Dot-Matrix Screen + Rotary Encoder Knob -->
-                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-5 mb-6">
+                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-6 mb-7">
                         <!-- OLED Display -->
-                        <div class="oled-screen flex-1 p-5 min-h-[150px] flex flex-col justify-between">
-                            <div class="flex items-center justify-between text-xs font-pixel text-stone-400 border-b border-stone-800 pb-1.5">
+                        <div class="oled-screen flex-1 p-5 sm:p-6 min-h-[160px] flex flex-col justify-between">
+                            <div class="flex items-center justify-between text-xs font-pixel text-stone-400 border-b border-stone-800 pb-2">
                                 <span id="oled-tag">AGICAMP // 模力揭榜 V2.1</span>
-                                <span class="pixel-green" id="oled-role-indicator">MODE: ALL_VIEW</span>
+                                <span class="pixel-green" id="oled-role-indicator">KEY [1-9] READY</span>
                             </div>
-                            <div class="my-2">
-                                <div class="text-xl sm:text-2xl font-bold text-white pixel-text leading-snug uppercase" id="oled-title">
-                                    BRING REAL PROBLEMS. CLARIFY NEXT STEP.
+                            <div class="my-3">
+                                <div class="text-xl sm:text-2xl font-bold text-white pixel-text leading-snug" id="oled-title">
+                                    CLAIM // 带着真问题来，把下一步想清楚
                                 </div>
-                                <p class="text-xs sm:text-sm text-emerald-300 mt-1.5 leading-relaxed font-bold" id="oled-desc">
-                                    按键盘 [1-9] 或点击下方立体键帽，3秒读懂全案核心机制；旋转右侧光环旋钮切换角色视角。
+                                <p class="text-xs sm:text-sm text-emerald-300 mt-2 leading-relaxed font-bold" id="oled-desc">
+                                    可匿名、可辩论、可回去自己试。现场不逼当场签约，也不预设必须开发 Agent。
                                 </p>
                             </div>
-                            <div class="flex items-center justify-between text-sm font-pixel pt-1">
+                            <div class="flex items-center justify-between text-sm font-pixel pt-2 border-t border-stone-800/80">
                                 <span class="text-stone-400" id="oled-code">KEY: P1</span>
-                                <span class="text-amber-400" id="oled-metric">100真问题 → 12节点 → 12~18付费试点</span>
+                                <span class="text-amber-400" id="oled-metric">100真题 → 12节点 → 12~18付费试点</span>
                                 <span class="pixel-green" id="oled-counter">01/09</span>
                             </div>
                         </div>
 
                         <!-- Right Side Rotary Knob + Green Status LED -->
                         <div class="flex sm:flex-col items-center justify-between sm:justify-center gap-3 shrink-0 self-center">
-                            <div onclick="rotateRoleKnob()" id="macro-knob" class="rotary-housing group" title="点击旋转切换视角 (全景/决策/运营/交付)">
+                            <div onclick="rotateRoleKnob()" id="macro-knob" class="rotary-housing group" title="点击旋转切换角色视角">
                                 <div class="rotary-ring">
                                     <svg class="w-11 h-11 text-zinc-900 group-hover:scale-105 transition" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
                                         <path d="M14 20C14 15.5817 17.5817 12 22 12H32C34.2091 12 36 13.7909 36 16V26C36 30.4183 32.4183 34 28 34H18C15.7909 34 14 32.2091 14 30V20Z" />
@@ -437,13 +442,13 @@
                             </div>
                             <div class="flex items-center space-x-2">
                                 <span class="w-3.5 h-3.5 rounded-full bg-[#16A34A] shadow-[0_0_10px_#22C55E] border border-emerald-900"></span>
-                                <span class="text-[11px] font-extrabold text-stone-600 uppercase tracking-wider" id="knob-label">旋钮:全景</span>
+                                <span class="text-xs font-extrabold text-stone-600" id="knob-label">旋钮:全景</span>
                             </div>
                         </div>
                     </div>
 
                     <!-- 3x3 Sculpted Mechanical Keycaps Grid -->
-                    <div class="keywell-grid grid grid-cols-3 gap-3.5 sm:gap-4" id="hero-keypad">
+                    <div class="keywell-grid grid grid-cols-3 gap-4 sm:gap-5 p-4" id="hero-keypad">
                         <!-- Populated dynamically via JS -->
                     </div>
                 </div>
@@ -451,54 +456,49 @@
 
             <!-- RIGHT COLUMN (5 Cols): Reference 2 White Framed Card with Sky-Blue Diorama Pills -->
             <div class="lg:col-span-5">
-                <div class="text-xs font-bold tracking-tight text-zinc-800 mb-1.5 flex items-center justify-between px-1">
+                <div class="text-xs font-bold tracking-tight text-zinc-800 mb-2 flex items-center justify-between px-1">
                     <span>moli_jiebang_v2.1</span>
-                    <button onclick="advanceDioramaStep()" class="text-red-600 hover:underline font-mono font-extrabold">[点击推进小人通关 ➔]</button>
+                    <button onclick="advanceDioramaStep()" class="text-red-600 hover:underline font-mono font-extrabold">[点此推进小人通关 ➔]</button>
                 </div>
 
                 <!-- Red Bounding Box Container -->
-                <div id="funnel-diorama" class="red-selection-frame white-device-card p-6 sm:p-8 relative">
+                <div id="funnel-diorama" class="red-selection-frame white-device-card p-7 sm:p-9 relative">
                     <div class="red-corner rc-tl"></div>
                     <div class="red-corner rc-tr"></div>
                     <div class="red-corner rc-bl"></div>
                     <div class="red-corner rc-br"></div>
 
                     <!-- Top Camera Notch Detail (Reference 2) -->
-                    <div class="w-36 h-5 bg-[#B2D4FA] rounded-b-2xl mx-auto -mt-6 sm:-mt-8 mb-5 shadow-inner"></div>
-
-                    <div class="flex items-center justify-between mb-3">
-                        <span class="text-xs font-extrabold uppercase tracking-wider text-blue-700">五阶需求通关微缩窗 · 点胶囊切阶段</span>
-                        <span class="text-[11px] font-pixel text-zinc-500">NO_FAKE_LEADS</span>
-                    </div>
+                    <div class="w-36 h-5 bg-[#B2D4FA] rounded-b-2xl mx-auto -mt-7 sm:-mt-9 mb-6 shadow-inner"></div>
 
                     <!-- 5 Recessed Diorama Pill Windows -->
-                    <div class="space-y-3" id="diorama-pills-container">
+                    <div class="space-y-3.5" id="diorama-pills-container">
                         <!-- Populated via JS -->
                     </div>
 
                     <!-- Selected Funnel Stage Detail Box -->
-                    <div id="diorama-stage-detail" class="mt-4 p-3.5 rounded-2xl bg-stone-100 border border-stone-200/80 text-xs space-y-1">
+                    <div id="diorama-stage-detail" class="mt-5 p-4 rounded-2xl bg-stone-100 border border-stone-200/90 text-xs space-y-1.5">
                         <!-- Populated via JS -->
                     </div>
 
                     <!-- Bold Bottom Typography + Oversized Hand Cursor (Reference 2) -->
-                    <div class="mt-5 pt-3 border-t border-zinc-100 flex items-end justify-between relative">
+                    <div class="mt-6 pt-4 border-t border-zinc-100 flex items-end justify-between relative">
                         <div>
                             <div class="text-3xl sm:text-4xl font-black tracking-tight text-zinc-950 leading-none">
                                 AGICamp26
                             </div>
-                            <div class="text-2xl sm:text-3xl font-extrabold tracking-tight text-zinc-900 mt-1 flex items-center">
+                            <div class="text-2xl sm:text-3xl font-extrabold tracking-tight text-zinc-900 mt-1.5 flex items-center">
                                 <span>模力揭榜</span>
                                 <span class="ml-1 inline-block border-b-4 border-zinc-900 leading-none pb-0.5">↓</span>
                             </div>
                         </div>
-                        <div class="text-right text-[11px] font-bold text-zinc-500">
-                            <div>不逼当场签约</div>
-                            <div>先想清楚下一步</div>
+                        <div class="text-right text-xs font-bold text-zinc-400">
+                            <div>五阶需求漏斗</div>
+                            <div>真通关才立项</div>
                         </div>
 
-                        <!-- Iconic Bold Outlined Hand Pointer SVG (Click advances funnel!) -->
-                        <svg onclick="advanceDioramaStep()" title="点击手势：推进需求通关下一阶段" class="w-14 h-14 text-zinc-950 cursor-pointer hover:scale-110 active:scale-95 transition-transform -mb-10 -mr-4 drop-shadow-md" viewBox="0 0 64 64" fill="#FFFFFF" stroke="#18181B" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+                        <!-- Iconic Bold Outlined Hand Pointer SVG -->
+                        <svg onclick="advanceDioramaStep()" title="点击手势：推进需求通关下一阶段" class="w-16 h-16 text-zinc-950 cursor-pointer hover:scale-110 active:scale-95 transition-transform -mb-11 -mr-5 drop-shadow-md" viewBox="0 0 64 64" fill="#FFFFFF" stroke="#18181B" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M26 12C26 9.23858 28.2386 7 31 7C33.7614 7 36 9.23858 36 12V28H39C41.7614 28 44 30.2386 44 33V34H47C49.7614 34 52 36.2386 52 39V46C52 53.732 45.732 60 38 60H27C20.9249 60 16 55.0751 16 49V37C16 34.2386 18.2386 32 21 32H26V12Z"/>
                             <line x1="34" y1="42" x2="34" y2="50" />
                             <line x1="40" y1="42" x2="40" y2="50" />
@@ -507,84 +507,60 @@
                     </div>
                 </div>
             </div>
-
         </section>
 
         <!-- =========================================================================
-             SECTION 02: 3D INDUSTRY / SCENARIO / PRODUCT KEYPAD (P5-P7 / P21)
+             DECK 02: 8 TARGET INDUSTRIES FLIP KEYPAD & MLJB 001 BENCHMARK
              ========================================================================= -->
-        <section id="scenarios" class="space-y-5 role-section" data-roles="ops delivery">
-            <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+        <section id="deck-2" class="deck-panel hidden space-y-8">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <span class="text-xs font-extrabold uppercase tracking-wider text-blue-900 bg-white/70 px-2.5 py-1 rounded-md">Section 02 · 三维选题与8大行业翻牌器 (点击键帽翻转看【会前证据】)</span>
-                    <h2 class="text-2xl sm:text-3xl font-black text-zinc-900 mt-1.5">按行业找人 · 按场景拆事 · 按边界定产品</h2>
+                    <span class="text-xs font-extrabold uppercase tracking-wider text-blue-900 bg-white/80 px-3 py-1 rounded-full">02 · 三维选题与 8 大行业翻牌器</span>
+                    <h2 class="text-2xl sm:text-3xl font-black text-zinc-900 mt-2">点击任意键帽翻转，核查【会前必收脱敏证据】</h2>
                 </div>
-                <div class="flex flex-wrap gap-2">
-                    <button onclick="filterIndustry('all')" id="btn-ind-all" class="px-3.5 py-1.5 rounded-xl text-xs font-extrabold bg-[#1E78FF] text-white border-b-4 border-[#05358A] active:translate-y-0.5 transition">全部8大行业</button>
-                    <button onclick="filterIndustry('priority')" id="btn-ind-pri" class="px-3.5 py-1.5 rounded-xl text-xs font-extrabold bg-[#FFEB14] text-zinc-900 border-b-4 border-[#B59900] active:translate-y-0.5 transition">★ 首阶段优先 (2)</button>
-                </div>
-            </div>
-
-            <!-- 3 Dimensions Ultra-Crisp Pill Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="hardware-chassis p-4 flex items-center space-x-3.5">
-                    <div class="w-10 h-10 rounded-xl bg-[#1E78FF] text-white font-pixel text-xl flex items-center justify-center shrink-0 shadow">D1</div>
-                    <div>
-                        <div class="text-sm font-black text-zinc-900">行业维度：找相似背景的人</div>
-                        <p class="text-xs text-stone-600">谁在什么环境遇阻 → 锁定同业邀约名单</p>
-                    </div>
-                </div>
-                <div class="hardware-chassis p-4 flex items-center space-x-3.5">
-                    <div class="w-10 h-10 rounded-xl bg-[#FFEB14] text-zinc-900 font-pixel text-xl flex items-center justify-center shrink-0 shadow">D2</div>
-                    <div>
-                        <div class="text-sm font-black text-zinc-900">场景维度：核实哪一步卡住</div>
-                        <p class="text-xs text-stone-600">先看脱敏证据与流程 → 不预设必做Agent</p>
-                    </div>
-                </div>
-                <div class="hardware-chassis p-4 flex items-center space-x-3.5">
-                    <div class="w-10 h-10 rounded-xl bg-[#09C62B] text-white font-pixel text-xl flex items-center justify-center shrink-0 shadow">D3</div>
-                    <div>
-                        <div class="text-sm font-black text-zinc-900">产品维度：明确输入与验收</div>
-                        <p class="text-xs text-stone-600">边界清晰才转需求 → 匹配OPC与FDE组件</p>
-                    </div>
+                <div class="flex gap-2.5">
+                    <button onclick="filterIndustry('all')" id="btn-ind-all" class="px-4 py-2 rounded-xl text-xs font-extrabold bg-[#1E78FF] text-white border-b-4 border-[#05358A] active:translate-y-0.5 transition">全部 8 大行业</button>
+                    <button onclick="filterIndustry('priority')" id="btn-ind-pri" class="px-4 py-2 rounded-xl text-xs font-extrabold bg-[#FFEB14] text-zinc-900 border-b-4 border-[#B59900] active:translate-y-0.5 transition">★ 首期优先 (2)</button>
                 </div>
             </div>
 
-            <!-- 8 Industry Tactile Flip Keycaps Grid -->
-            <div class="keywell-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" id="industry-grid">
-                <!-- Populated by JS (Interactive Flip Cards) -->
+            <!-- 8 Industry Tactile Flip Keycaps Grid (Spacious 4x2) -->
+            <div class="hardware-chassis p-6 sm:p-8">
+                <div class="keywell-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 p-4" id="industry-grid">
+                    <!-- Populated by JS -->
+                </div>
             </div>
 
-            <!-- Benchmark First Pilot Showcase (MLJB 001 - P21) -->
-            <div class="red-selection-frame white-device-card p-6 sm:p-7">
+            <!-- Benchmark First Pilot Showcase (MLJB 001) -->
+            <div class="red-selection-frame white-device-card p-7 sm:p-9">
                 <div class="red-corner rc-tl"></div>
                 <div class="red-corner rc-tr"></div>
                 <div class="red-corner rc-bl"></div>
                 <div class="red-corner rc-br"></div>
 
-                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-                    <div class="space-y-2 lg:max-w-2xl">
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+                    <div class="space-y-2.5 max-w-xl">
                         <div class="inline-flex flex-wrap items-center gap-2 text-xs font-extrabold">
-                            <span class="px-2.5 py-0.5 rounded-lg bg-[#FFEB14] text-zinc-950 border border-yellow-600">首期标杆试点 MLJB 001</span>
-                            <span class="px-2.5 py-0.5 rounded-lg bg-stone-100 text-stone-700 font-mono">1品类 × 2市场 × 60样本(20调+40测) × 3周</span>
+                            <span class="px-3 py-1 rounded-lg bg-[#FFEB14] text-zinc-950">首期标杆试点 MLJB 001</span>
+                            <span class="px-3 py-1 rounded-lg bg-stone-100 text-stone-700 font-mono">1品类 × 2市场 × 60样本 × 3周</span>
                         </div>
-                        <h3 class="text-lg sm:text-xl font-black text-zinc-950">“一个商品，怎么讲给不同市场听” · 出海电商本地化验证</h3>
-                        <p class="text-xs text-zinc-600 leading-relaxed">
-                            <strong>FDE×OPC动作：</strong>FDE跟岗实测翻译审核工时、适配商品事实表；OPC提供内容工作流。<strong>红线边界：</strong>不含自动发布、不含ERP重度集成、不含自动法律合规裁决。
+                        <h3 class="text-xl sm:text-2xl font-black text-zinc-950">“一个商品，怎么讲给不同市场听”</h3>
+                        <p class="text-xs sm:text-sm text-zinc-600 leading-relaxed">
+                            FDE 跟岗实测翻译返工工时，OPC 提供多语言工作流。<strong>明确边界：</strong>不含自动发布、不含 ERP 复杂集成。
                         </p>
                     </div>
-                    <div class="grid grid-cols-3 gap-3 shrink-0">
-                        <div onclick="playClick(920)" class="keycap key-green text-center items-center justify-center min-w-[100px]">
-                            <div class="text-2xl sm:text-3xl font-black font-pixel">-30%</div>
-                            <div class="text-[11px] font-bold mt-1">合格稿工时</div>
+                    <div class="grid grid-cols-3 gap-4 shrink-0">
+                        <div onclick="playClick(920)" class="keycap key-green text-center items-center justify-center min-w-[110px] py-4">
+                            <div class="text-3xl font-black font-pixel">-30%</div>
+                            <div class="text-xs font-bold mt-1">合格稿工时</div>
                         </div>
-                        <div onclick="playClick(960)" class="keycap key-blue text-center items-center justify-center min-w-[100px]">
-                            <div class="text-2xl sm:text-3xl font-black font-pixel">≥98%</div>
-                            <div class="text-[11px] font-bold mt-1">规格准确率</div>
+                        <div onclick="playClick(960)" class="keycap key-blue text-center items-center justify-center min-w-[110px] py-4">
+                            <div class="text-3xl font-black font-pixel">≥98%</div>
+                            <div class="text-xs font-bold mt-1">规格准确率</div>
                         </div>
-                        <div onclick="playClick(1000)" class="keycap key-yellow text-center items-center justify-center min-w-[100px]">
-                            <div class="text-2xl sm:text-3xl font-black font-pixel">0_ERR</div>
-                            <div class="text-[11px] font-bold mt-1">重大事实错误</div>
+                        <div onclick="playClick(1000)" class="keycap key-yellow text-center items-center justify-center min-w-[110px] py-4">
+                            <div class="text-3xl font-black font-pixel">0_ERR</div>
+                            <div class="text-xs font-bold mt-1">重大事实错</div>
                         </div>
                     </div>
                 </div>
@@ -592,55 +568,42 @@
         </section>
 
         <!-- =========================================================================
-             SECTION 03: 12-MONTH ACTIVITY SEQUENCER & AGENDA SIMULATOR (P8-P12)
+             DECK 03: 12-MONTH SEQUENCER + FDE x OPC 6-STEP GATEWAY
              ========================================================================= -->
-        <section id="calendar" class="space-y-5 role-section" data-roles="ops">
-            <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+        <section id="deck-3" class="deck-panel hidden space-y-8">
+            <!-- Sub-toggle between 12-Month Calendar & FDE 6-Step -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <span class="text-xs font-extrabold uppercase tracking-wider text-blue-900 bg-white/70 px-2.5 py-1 rounded-md">Section 03 · 12节点档期合成器 (点击月份在下方屏幕看产出)</span>
-                    <h2 class="text-2xl sm:text-3xl font-black text-zinc-900 mt-1.5">月度发现问题 · 季度拆解任务 · 半年度回访揭榜</h2>
+                    <span class="text-xs font-extrabold uppercase tracking-wider text-blue-900 bg-white/80 px-3 py-1 rounded-full">03 · 全年12节点合成器 & FDE驻场机制</span>
+                    <h2 class="text-2xl sm:text-3xl font-black text-zinc-900 mt-2">8月度发现 + 2季度拆解 + 2半年度揭榜</h2>
                 </div>
-                <div class="flex flex-wrap gap-2 text-xs font-extrabold">
-                    <span class="px-3 py-1 rounded-xl bg-white border-b-2 border-stone-300 text-zinc-800">8场月度 (20人/2h)</span>
-                    <span class="px-3 py-1 rounded-xl bg-[#1E78FF] text-white">2场季度 (40人/3h)</span>
-                    <span class="px-3 py-1 rounded-xl bg-[#FFEB14] text-zinc-900">2场共创节 (100人/1d)</span>
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="playAgendaSimulation()" id="btn-agenda-play" class="px-4 py-2 rounded-xl text-xs font-extrabold bg-[#09C62B] text-white border-b-4 border-[#036814] active:translate-y-0.5 transition flex items-center space-x-1.5">
+                        <i class="fa-solid fa-play"></i>
+                        <span>自动推演沙盘</span>
+                    </button>
+                    <button onclick="switchAgenda('monthly')" id="btn-agenda-monthly" class="px-3.5 py-2 rounded-xl text-xs font-extrabold bg-[#1E78FF] text-white border-b-4 border-[#05358A] transition">月度(2h)</button>
+                    <button onclick="switchAgenda('quarterly')" id="btn-agenda-quarterly" class="px-3.5 py-2 rounded-xl text-xs font-extrabold bg-white text-zinc-800 border-b-4 border-stone-300 transition">季度(3h)</button>
+                    <button onclick="switchAgenda('festival')" id="btn-agenda-festival" class="px-3.5 py-2 rounded-xl text-xs font-extrabold bg-white text-zinc-800 border-b-4 border-stone-300 transition">共创节(1d)</button>
                 </div>
             </div>
 
-            <!-- 12 Months Hardware Sequencer Keys + Live Status Strip -->
-            <div class="hardware-chassis p-5 sm:p-6 space-y-4">
-                <div class="oled-screen px-5 py-3 flex flex-wrap items-center justify-between gap-2 text-xs">
-                    <div class="flex items-center space-x-2">
-                        <span class="pixel-green font-pixel text-base" id="cal-oled-month">M01 // 月度专场</span>
-                        <span class="text-white font-bold" id="cal-oled-theme">出海电商内容本地化</span>
+            <!-- 12 Months Sequencer + Live OLED Strip -->
+            <div class="hardware-chassis p-6 sm:p-8 space-y-5">
+                <div class="oled-screen px-6 py-4 flex flex-wrap items-center justify-between gap-3">
+                    <div class="flex items-center space-x-3">
+                        <span class="pixel-green font-pixel text-xl" id="cal-oled-month">M01 // 月度专场</span>
+                        <span class="text-white font-black text-base" id="cal-oled-theme">出海电商内容本地化</span>
                     </div>
-                    <div class="text-amber-300 font-medium" id="cal-oled-out">核心产出：源资料、文案审核与返工困惑问题卡</div>
+                    <div class="text-amber-300 text-xs sm:text-sm font-bold" id="cal-oled-out">核心产出：源资料、文案审核与返工困惑问题卡</div>
                 </div>
-                <div class="keywell-grid grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3" id="calendar-grid">
+                <div class="keywell-grid grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5 p-3.5" id="calendar-grid">
                     <!-- Populated by JS -->
                 </div>
-            </div>
 
-            <!-- Event Format & Auto-Play Agenda Simulator -->
-            <div class="hardware-chassis p-6 sm:p-7">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b-2 border-stone-300">
-                    <div>
-                        <h3 class="text-lg sm:text-xl font-black text-zinc-900" id="agenda-title">月度主题专场 · 120分钟沙盘推演</h3>
-                        <p class="text-xs font-bold text-stone-600 mt-0.5" id="agenda-subtitle">20人黄金配比：发题企3 + 同行5 + OPC6 + 智囊3 + 主持记录3</p>
-                    </div>
-                    <div class="flex flex-wrap items-center gap-2">
-                        <button onclick="playAgendaSimulation()" id="btn-agenda-play" class="px-3.5 py-2 rounded-xl text-xs font-extrabold bg-[#09C62B] text-white border-b-4 border-[#036814] active:translate-y-0.5 transition flex items-center space-x-1">
-                            <i class="fa-solid fa-play"></i>
-                            <span>自动推演环节</span>
-                        </button>
-                        <button onclick="switchAgenda('monthly')" id="btn-agenda-monthly" class="px-3 py-2 rounded-xl text-xs font-extrabold bg-[#1E78FF] text-white border-b-4 border-[#05358A] transition">月度(2h)</button>
-                        <button onclick="switchAgenda('quarterly')" id="btn-agenda-quarterly" class="px-3 py-2 rounded-xl text-xs font-extrabold bg-white text-zinc-800 border-b-4 border-stone-300 transition">季度(3h)</button>
-                        <button onclick="switchAgenda('festival')" id="btn-agenda-festival" class="px-3 py-2 rounded-xl text-xs font-extrabold bg-white text-zinc-800 border-b-4 border-stone-300 transition">共创节(1d)</button>
-                    </div>
-                </div>
-
-                <div class="mt-5 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-                    <div class="lg:col-span-8 space-y-2" id="agenda-steps">
+                <!-- Clean Agenda Steps + Rules -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 pt-3 items-start">
+                    <div class="lg:col-span-8 space-y-2.5" id="agenda-steps">
                         <!-- Populated by JS -->
                     </div>
                     <div class="lg:col-span-4 oled-screen p-5 space-y-3" id="agenda-rules">
@@ -648,146 +611,114 @@
                     </div>
                 </div>
             </div>
-        </section>
 
-        <!-- =========================================================================
-             SECTION 04: FDE x OPC COLLABORATION DIORAMA & KEYCAPS (P16-17 / P32-35)
-             ========================================================================= -->
-        <section id="fde-opc" class="space-y-5 role-section" data-roles="delivery exec">
-            <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-                <div>
-                    <span class="text-xs font-extrabold uppercase tracking-wider text-blue-900 bg-white/70 px-2.5 py-1 rounded-md">Section 04 · FDE前线部署工程师 × OPC 协同矩阵</span>
-                    <h2 class="text-2xl sm:text-3xl font-black text-zinc-900 mt-1.5">揭榜找真题 · 智囊做判断 · FDE驻场联调OPC交付</h2>
-                </div>
-                <span class="text-xs font-extrabold text-red-700 bg-red-50 border border-red-200 px-3 py-1 rounded-lg">红线：1名主责FDE同期仅1个试点 | 1名PM最多并行2个</span>
-            </div>
-
-            <!-- 5 Role Matrix Keycaps -->
-            <div class="keywell-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5" id="role-matrix">
-                <!-- Populated by JS -->
-            </div>
-
-            <!-- Interactive FDE 6-Step Stepper -->
-            <div class="red-selection-frame white-device-card p-6 sm:p-7">
+            <!-- FDE 6-Step Gateway Card -->
+            <div class="red-selection-frame white-device-card p-7 sm:p-9 space-y-5">
                 <div class="red-corner rc-tl"></div>
                 <div class="red-corner rc-tr"></div>
                 <div class="red-corner rc-bl"></div>
                 <div class="red-corner rc-br"></div>
 
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-5">
-                    <div>
-                        <h3 class="text-lg sm:text-xl font-black text-zinc-950 flex items-center">
-                            <span class="w-7 h-7 rounded-lg bg-[#1E78FF] text-white font-pixel text-base flex items-center justify-center mr-2">6X</span>
-                            FDE 入企实施六步通关闸门 (点击任意阶段点亮核查)
-                        </h3>
-                    </div>
-                    <span class="text-xs font-bold text-zinc-500">必配“企业业务搭档” · 每周演示可运行结果</span>
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <h3 class="text-xl font-black text-zinc-950">FDE 前线工程师入企六步通关闸门（点击切换阶段）</h3>
+                    <span class="text-xs font-extrabold text-red-600 bg-red-50 px-3 py-1 rounded-lg">红线：1名主责FDE同期仅1个试点</span>
                 </div>
-
-                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3" id="fde-pipeline">
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3.5" id="fde-pipeline">
                     <!-- Populated by JS -->
                 </div>
             </div>
         </section>
 
         <!-- =========================================================================
-             SECTION 05: FINANCIAL MIXER & UNIT ECONOMICS CONSOLE (P22, P23, P34)
+             DECK 04: FINANCIAL MIXER & UNIT ECONOMICS CONSOLE
              ========================================================================= -->
-        <section id="economics" class="space-y-5 role-section" data-roles="exec delivery">
-            <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+        <section id="deck-4" class="deck-panel hidden space-y-8">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <span class="text-xs font-extrabold uppercase tracking-wider text-blue-900 bg-white/70 px-2.5 py-1 rounded-md">Section 05 · 营收与盈亏平衡硬件调音台</span>
-                    <h2 class="text-2xl sm:text-3xl font-black text-zinc-900 mt-1.5">拨动推子实时测算：19个轻量试点覆盖全年公共成本</h2>
+                    <span class="text-xs font-extrabold uppercase tracking-wider text-blue-900 bg-white/80 px-3 py-1 rounded-full">04 · 营收与盈亏平衡硬件调音台</span>
+                    <h2 class="text-2xl sm:text-3xl font-black text-zinc-900 mt-2">拨动推子实时测算：19个轻量试点覆盖全年公共成本</h2>
                 </div>
-                <span class="text-xs font-bold px-3 py-1 rounded-lg bg-white/80 text-zinc-700">不含税口径 | 运营 ¥800/人日 | FDE ¥1,500/人日</span>
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="applyPreset('90days')" class="px-3.5 py-2 rounded-xl bg-white border-b-4 border-stone-300 text-xs font-extrabold text-zinc-800 active:translate-y-0.5 transition">首90天验证</button>
+                    <button onclick="applyPreset('base18')" class="px-3.5 py-2 rounded-xl bg-[#1E78FF] border-b-4 border-[#05358A] text-xs font-extrabold text-white active:translate-y-0.5 transition">首年基准(18试点)</button>
+                    <button onclick="applyPreset('fdeMix')" class="px-3.5 py-2 rounded-xl bg-[#09C62B] border-b-4 border-[#036814] text-xs font-extrabold text-white active:translate-y-0.5 transition">FDE混合进阶</button>
+                </div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                <!-- Left Controls: Tactile Hardware Sliders -->
-                <div class="lg:col-span-7 hardware-chassis p-6 sm:p-7 space-y-5">
-                    <div class="flex flex-wrap items-center justify-between gap-2 border-b-2 border-stone-300 pb-3.5">
-                        <h3 class="font-black text-zinc-900 text-base">情景预设键：一键载入业务参数</h3>
-                        <div class="flex flex-wrap gap-2">
-                            <button onclick="applyPreset('90days')" class="px-3 py-1.5 rounded-xl bg-white border-b-4 border-stone-300 text-xs font-extrabold text-zinc-800 active:translate-y-0.5 transition">首90天验证</button>
-                            <button onclick="applyPreset('base18')" class="px-3 py-1.5 rounded-xl bg-[#1E78FF] border-b-4 border-[#05358A] text-xs font-extrabold text-white active:translate-y-0.5 transition">首年基准(18试点)</button>
-                            <button onclick="applyPreset('fdeMix')" class="px-3 py-1.5 rounded-xl bg-[#09C62B] border-b-4 border-[#036814] text-xs font-extrabold text-white active:translate-y-0.5 transition">FDE混合进阶</button>
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <!-- Left Controls: Tactile Sliders -->
+                <div class="lg:col-span-7 hardware-chassis p-7 sm:p-9 space-y-6">
+                    <div class="p-4 rounded-2xl bg-white/90 border border-stone-300">
+                        <div class="flex justify-between text-sm mb-2">
+                            <span class="text-zinc-900 font-extrabold">1. 轻量场景试点 (报价 ¥50k / 贡献 ¥12k)</span>
+                            <span class="font-pixel text-xl px-3 py-0.5 rounded-lg bg-zinc-900 text-[#FFEB14]" id="val-light-pilots">18 个</span>
                         </div>
+                        <input type="range" id="slider-light" min="0" max="30" value="18" oninput="updateFinancials()" class="w-full cursor-pointer">
                     </div>
 
-                    <!-- Sliders -->
-                    <div class="space-y-4">
-                        <div class="p-3.5 rounded-2xl bg-white/80 border border-stone-300">
-                            <div class="flex justify-between text-xs sm:text-sm mb-1.5">
-                                <span class="text-zinc-900 font-extrabold">1. 轻量场景试点 (报价 ¥50k / 毛利贡献 ¥12k)</span>
-                                <span class="font-pixel text-xl px-2.5 py-0.5 rounded bg-zinc-900 text-[#FFEB14]" id="val-light-pilots">18 个</span>
-                            </div>
-                            <input type="range" id="slider-light" min="0" max="30" value="18" oninput="updateFinancials()" class="w-full cursor-pointer">
+                    <div class="p-4 rounded-2xl bg-white/90 border border-stone-300">
+                        <div class="flex justify-between text-sm mb-2">
+                            <span class="text-zinc-900 font-extrabold">2. FDE 入企诊断 (报价 ¥15k / 5人日 / 贡献 ¥5k)</span>
+                            <span class="font-pixel text-xl px-3 py-0.5 rounded-lg bg-zinc-900 text-sky-400" id="val-fde-diag">0 个</span>
                         </div>
+                        <input type="range" id="slider-diag" min="0" max="20" value="0" oninput="updateFinancials()" class="w-full cursor-pointer">
+                    </div>
 
-                        <div class="p-3.5 rounded-2xl bg-white/80 border border-stone-300">
-                            <div class="flex justify-between text-xs sm:text-sm mb-1.5">
-                                <span class="text-zinc-900 font-extrabold">2. FDE 入企诊断 (报价 ¥15k / 5人日 / 贡献 ¥5k)</span>
-                                <span class="font-pixel text-xl px-2.5 py-0.5 rounded bg-zinc-900 text-sky-400" id="val-fde-diag">0 个</span>
-                            </div>
-                            <input type="range" id="slider-diag" min="0" max="20" value="0" oninput="updateFinancials()" class="w-full cursor-pointer">
+                    <div class="p-4 rounded-2xl bg-white/90 border border-stone-300">
+                        <div class="flex justify-between text-sm mb-2">
+                            <span class="text-zinc-900 font-extrabold">3. FDE 深度试点 (报价 ¥80k / 12人日+OPC / 贡献 ¥24k)</span>
+                            <span class="font-pixel text-xl px-3 py-0.5 rounded-lg bg-zinc-900 text-emerald-400" id="val-fde-pilots">0 个</span>
                         </div>
+                        <input type="range" id="slider-fde" min="0" max="15" value="0" oninput="updateFinancials()" class="w-full cursor-pointer">
+                    </div>
 
-                        <div class="p-3.5 rounded-2xl bg-white/80 border border-stone-300">
-                            <div class="flex justify-between text-xs sm:text-sm mb-1.5">
-                                <span class="text-zinc-900 font-extrabold">3. FDE 深度试点 (报价 ¥80k / 12人日+OPC / 贡献 ¥24k)</span>
-                                <span class="font-pixel text-xl px-2.5 py-0.5 rounded bg-zinc-900 text-emerald-400" id="val-fde-pilots">0 个</span>
-                            </div>
-                            <input type="range" id="slider-fde" min="0" max="15" value="0" oninput="updateFinancials()" class="w-full cursor-pointer">
+                    <div class="grid grid-cols-3 gap-4 pt-1">
+                        <div class="p-3.5 rounded-2xl bg-white border border-stone-300">
+                            <label class="block text-xs font-extrabold text-stone-600 mb-1.5">月度 (¥3k+6d)</label>
+                            <input type="number" id="num-monthly" min="0" max="12" value="8" onchange="updateFinancials()" class="w-full bg-stone-900 font-pixel text-xl rounded-xl px-3 py-1 text-white">
                         </div>
-
-                        <div class="grid grid-cols-3 gap-3">
-                            <div class="p-2.5 rounded-xl bg-white border border-stone-300">
-                                <label class="block text-[11px] font-bold text-stone-600 mb-1">月度 (¥3k+6d)</label>
-                                <input type="number" id="num-monthly" min="0" max="12" value="8" onchange="updateFinancials()" class="w-full bg-stone-900 font-pixel text-lg rounded-lg px-2.5 py-0.5 text-white">
-                            </div>
-                            <div class="p-2.5 rounded-xl bg-white border border-stone-300">
-                                <label class="block text-[11px] font-bold text-stone-600 mb-1">季度 (¥10k+12d)</label>
-                                <input type="number" id="num-quarterly" min="0" max="4" value="2" onchange="updateFinancials()" class="w-full bg-stone-900 font-pixel text-lg rounded-lg px-2.5 py-0.5 text-white">
-                            </div>
-                            <div class="p-2.5 rounded-xl bg-white border border-stone-300">
-                                <label class="block text-[11px] font-bold text-stone-600 mb-1">共创节 (¥40k+25d)</label>
-                                <input type="number" id="num-festival" min="0" max="2" value="2" onchange="updateFinancials()" class="w-full bg-stone-900 font-pixel text-lg rounded-lg px-2.5 py-0.5 text-white">
-                            </div>
+                        <div class="p-3.5 rounded-2xl bg-white border border-stone-300">
+                            <label class="block text-xs font-extrabold text-stone-600 mb-1.5">季度 (¥10k+12d)</label>
+                            <input type="number" id="num-quarterly" min="0" max="4" value="2" onchange="updateFinancials()" class="w-full bg-stone-900 font-pixel text-xl rounded-xl px-3 py-1 text-white">
+                        </div>
+                        <div class="p-3.5 rounded-2xl bg-white border border-stone-300">
+                            <label class="block text-xs font-extrabold text-stone-600 mb-1.5">共创节 (¥40k+25d)</label>
+                            <input type="number" id="num-festival" min="0" max="2" value="2" onchange="updateFinancials()" class="w-full bg-stone-900 font-pixel text-xl rounded-xl px-3 py-1 text-white">
                         </div>
                     </div>
                 </div>
 
                 <!-- Right Output: OLED Financial Terminal -->
-                <div class="lg:col-span-5 hardware-chassis p-6 flex flex-col justify-between">
-                    <div class="oled-screen p-5 h-full flex flex-col justify-between space-y-4">
+                <div class="lg:col-span-5 hardware-chassis p-6 sm:p-7 flex flex-col justify-between">
+                    <div class="oled-screen p-6 h-full flex flex-col justify-between space-y-5">
                         <div>
-                            <div class="flex items-center justify-between border-b border-stone-800 pb-2.5 mb-3">
+                            <div class="flex items-center justify-between border-b border-stone-800 pb-3 mb-4">
                                 <span class="font-pixel text-base text-stone-400">FIN_MIXER // 经营看板</span>
                                 <span id="fin-status-badge" class="text-xs font-bold px-2.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40">接近盈亏平衡</span>
                             </div>
 
-                            <div class="grid grid-cols-2 gap-2.5 mb-4">
-                                <div class="p-3 rounded-xl bg-stone-900/90 border border-stone-800">
-                                    <div class="text-[11px] text-stone-400">合同总营收</div>
-                                    <div class="text-2xl font-pixel text-white" id="out-total-rev">¥900,000</div>
+                            <div class="grid grid-cols-2 gap-3.5 mb-5">
+                                <div class="p-4 rounded-xl bg-stone-900/90 border border-stone-800">
+                                    <div class="text-xs text-stone-400">合同总营收</div>
+                                    <div class="text-2xl sm:text-3xl font-pixel text-white mt-1" id="out-total-rev">¥900,000</div>
                                 </div>
-                                <div class="p-3 rounded-xl bg-stone-900/90 border border-stone-800">
-                                    <div class="text-[11px] text-stone-400">项目直接贡献</div>
-                                    <div class="text-2xl font-pixel pixel-green" id="out-project-contrib">¥216,000</div>
+                                <div class="p-4 rounded-xl bg-stone-900/90 border border-stone-800">
+                                    <div class="text-xs text-stone-400">项目直接贡献</div>
+                                    <div class="text-2xl sm:text-3xl font-pixel pixel-green mt-1" id="out-project-contrib">¥216,000</div>
                                 </div>
-                                <div class="p-3 rounded-xl bg-stone-900/90 border border-stone-800">
-                                    <div class="text-[11px] text-stone-400">公共现金+人力</div>
-                                    <div class="text-2xl font-pixel text-rose-400" id="out-public-cost">¥221,600</div>
-                                    <div class="text-[10px] text-stone-400" id="out-public-detail">现金 ¥124,000 + 122d</div>
+                                <div class="p-4 rounded-xl bg-stone-900/90 border border-stone-800">
+                                    <div class="text-xs text-stone-400">公共现金+人力</div>
+                                    <div class="text-2xl sm:text-3xl font-pixel text-rose-400 mt-1" id="out-public-cost">¥221,600</div>
+                                    <div class="text-[11px] text-stone-400 mt-0.5" id="out-public-detail">现金 ¥124,000 + 122d</div>
                                 </div>
-                                <div class="p-3 rounded-xl bg-stone-900/90 border border-stone-800">
-                                    <div class="text-[11px] text-stone-400">扣公共成本净额</div>
-                                    <div class="text-2xl font-pixel text-amber-400" id="out-net-balance">-¥5,600</div>
-                                    <div class="text-[10px] text-stone-400">不含固定费与赞助</div>
+                                <div class="p-4 rounded-xl bg-stone-900/90 border border-stone-800">
+                                    <div class="text-xs text-stone-400">扣公共成本净额</div>
+                                    <div class="text-2xl sm:text-3xl font-pixel text-amber-400 mt-1" id="out-net-balance">-¥5,600</div>
+                                    <div class="text-[11px] text-stone-400 mt-0.5">不含固定费与赞助</div>
                                 </div>
                             </div>
 
-                            <div class="text-xs border-t border-stone-800 pt-3 space-y-1.5">
+                            <div class="text-xs border-t border-stone-800 pt-4 space-y-2">
                                 <div class="grid grid-cols-3 text-stone-400 pb-1 border-b border-stone-800">
                                     <span>单项目拆解</span>
                                     <span class="text-right">轻量(¥50k)</span>
@@ -803,12 +734,7 @@
                                     <span class="text-right text-stone-500">含于PM</span>
                                     <span class="text-right text-sky-300 font-mono">¥18,000</span>
                                 </div>
-                                <div class="grid grid-cols-3 text-stone-300">
-                                    <span>PM/专家/测试</span>
-                                    <span class="text-right font-mono">¥10,000</span>
-                                    <span class="text-right font-mono">¥10,000</span>
-                                </div>
-                                <div class="grid grid-cols-3 font-bold text-emerald-400 pt-1 border-t border-stone-800">
+                                <div class="grid grid-cols-3 font-bold text-emerald-400 pt-1.5 border-t border-stone-800">
                                     <span>单项目贡献</span>
                                     <span class="text-right font-mono">¥12,000(24%)</span>
                                     <span class="text-right font-mono">¥24,000(30%)</span>
@@ -817,7 +743,7 @@
                         </div>
 
                         <div class="flex items-center justify-between text-xs font-pixel text-stone-500 pt-2 border-t border-stone-800">
-                            <span>付款建议: 50%启动 / 30%中期 / 20%验收</span>
+                            <span>付款节点: 50%启动 / 30%中期 / 20%验收</span>
                             <span class="pixel-green">READY</span>
                         </div>
                     </div>
@@ -826,101 +752,73 @@
         </section>
 
         <!-- =========================================================================
-             SECTION 06: INTERACTIVE WORKBENCH & TEMPLATES (P27-P31)
+             DECK 05: RECEIPT PRINTER WORKBENCH & 100-PT EVALUATOR
              ========================================================================= -->
-        
-
-        <!-- =========================================================================
-             SECTION 03: 12-MONTH ACTIVITY SEQUENCER & AGENDA SIMULATOR (P8-P12)
-             ========================================================================= -->
-        
-
-        <!-- =========================================================================
-             SECTION 04: FDE x OPC COLLABORATION DIORAMA & KEYCAPS (P16-17 / P32-35)
-             ========================================================================= -->
-        
-
-        <!-- =========================================================================
-             SECTION 05: FINANCIAL MIXER & UNIT ECONOMICS CONSOLE (P22, P23, P34)
-             ========================================================================= -->
-        
-
-        <!-- =========================================================================
-             SECTION 06: INTERACTIVE WORKBENCH & TEMPLATES (P27-P31)
-             ========================================================================= -->
-        <section id="workbench" class="space-y-6 role-section" data-roles="ops delivery exec">
-            <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+        <section id="deck-5" class="deck-panel hidden space-y-8">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <span class="text-xs font-extrabold uppercase tracking-wider text-blue-900 bg-white/70 px-2.5 py-1 rounded-md">Section 06 · 可复制工作模板与立项决策终端 (P27-P31)</span>
-                    <h2 class="text-2xl sm:text-3xl font-black text-zinc-900 mt-2">轻征题生成问题卡 · 揭榜100分制评测器 · 90天启动与立项6项决定</h2>
+                    <span class="text-xs font-extrabold uppercase tracking-wider text-blue-900 bg-white/80 px-3 py-1 rounded-full">05 · 实战工具终端</span>
+                    <h2 class="text-2xl sm:text-3xl font-black text-zinc-900 mt-2">问题卡热敏打票机 · 揭榜100分评测 · 立项6决定</h2>
+                </div>
+                <div class="flex flex-wrap gap-2.5">
+                    <button onclick="switchToolTab('card')" id="tab-btn-card" class="px-4 py-2 rounded-xl text-xs font-black bg-[#1E78FF] text-white border-b-4 border-[#05358A] transition">01 · 问题卡打票机</button>
+                    <button onclick="switchToolTab('eval')" id="tab-btn-eval" class="px-4 py-2 rounded-xl text-xs font-black bg-white text-zinc-800 border-b-4 border-stone-300 transition">02 · 100分评测器</button>
+                    <button onclick="switchToolTab('roadmap')" id="tab-btn-roadmap" class="px-4 py-2 rounded-xl text-xs font-black bg-white text-zinc-800 border-b-4 border-stone-300 transition">03 · 90天与6决定</button>
                 </div>
             </div>
 
-            <!-- Workbench Mechanical Tabs -->
-            <div class="flex flex-wrap gap-3">
-                <button onclick="switchToolTab('card')" id="tab-btn-card" class="px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-black bg-[#1E78FF] text-white border-b-4 border-[#05358A] active:translate-y-0.5 transition">
-                    P29 · 附录一：企业轻征题 & 问题卡生成器
-                </button>
-                <button onclick="switchToolTab('eval')" id="tab-btn-eval" class="px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-black bg-white text-zinc-800 border-b-4 border-stone-300 active:translate-y-0.5 transition">
-                    P31 · 附录三：自愿揭榜100分制评测器
-                </button>
-                <button onclick="switchToolTab('roadmap')" id="tab-btn-roadmap" class="px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-black bg-white text-zinc-800 border-b-4 border-stone-300 active:translate-y-0.5 transition">
-                    P27-28 · 首90天排期 & 立项6项决定核查
-                </button>
-            </div>
-
             <!-- TAB 1: QUESTION CARD GENERATOR -->
-            <div id="tool-tab-card" class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-                <div class="lg:col-span-6 hardware-chassis p-6 sm:p-8 space-y-4">
+            <div id="tool-tab-card" class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                <div class="lg:col-span-6 hardware-chassis p-7 sm:p-8 space-y-4">
                     <div class="flex items-center justify-between border-b-2 border-stone-300 pb-3">
-                        <h3 class="font-black text-zinc-900 text-base">填写企业轻征题表 (第一阶段不问预算)</h3>
-                        <button onclick="fillSampleCard()" class="px-3 py-1 rounded-lg bg-[#FFEB14] text-zinc-900 font-extrabold text-xs border-b-2 border-yellow-600 active:translate-y-0.5">切换行业样例 ↻</button>
+                        <h3 class="font-black text-zinc-900 text-base">企业轻征题录入 (首阶段不问预算)</h3>
+                        <button onclick="fillSampleCard()" class="px-3.5 py-1.5 rounded-xl bg-[#FFEB14] text-zinc-900 font-extrabold text-xs border-b-2 border-yellow-600 active:translate-y-0.5">切换真题样例 ↻</button>
                     </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs font-bold">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 text-xs font-bold">
                         <div>
-                            <label class="text-stone-600 block mb-1">问题编号 & 匿名代号</label>
-                            <input type="text" id="inp-code" value="MLJB 001 | 某出海家居电商团队" oninput="renderQuestionCard()" class="w-full bg-white border-2 border-stone-300 rounded-xl px-3 py-2 text-zinc-900">
+                            <label class="text-stone-600 block mb-1">编号 & 匿名代号</label>
+                            <input type="text" id="inp-code" value="MLJB 001 | 某出海家居电商" oninput="renderQuestionCard()" class="w-full bg-white border-2 border-stone-300 rounded-xl px-3.5 py-2 text-zinc-900">
                         </div>
                         <div>
-                            <label class="text-stone-600 block mb-1">所属行业与责任部门</label>
-                            <input type="text" id="inp-ind" value="出海电商 · 多语言内容运营部" oninput="renderQuestionCard()" class="w-full bg-white border-2 border-stone-300 rounded-xl px-3 py-2 text-zinc-900">
+                            <label class="text-stone-600 block mb-1">行业与部门</label>
+                            <input type="text" id="inp-ind" value="出海电商 · 内容运营部" oninput="renderQuestionCard()" class="w-full bg-white border-2 border-stone-300 rounded-xl px-3.5 py-2 text-zinc-900">
                         </div>
                     </div>
                     <div class="text-xs font-bold">
-                        <label class="text-stone-600 block mb-1">最近一次卡住的具体经历与影响频次</label>
-                        <textarea id="inp-story" rows="2" oninput="renderQuestionCard()" class="w-full bg-white border-2 border-stone-300 rounded-xl px-3 py-2 text-zinc-900">同一份商品资料需适配欧美日多个市场，用大模型生成首稿很快，但合规审核、规格核对和本地化表达返工仍然耗时，每周积压上百款新品。</textarea>
+                        <label class="text-stone-600 block mb-1">最近一次卡住的经历</label>
+                        <textarea id="inp-story" rows="2" oninput="renderQuestionCard()" class="w-full bg-white border-2 border-stone-300 rounded-xl px-3.5 py-2 text-zinc-900">商品资料需适配欧美日多市场，AI生成首稿快，但规格核对与本地化返工极耗人力。</textarea>
                     </div>
                     <div class="text-xs font-bold">
-                        <label class="text-stone-600 block mb-1">最希望大家帮你想清楚什么？（核心困惑）</label>
-                        <textarea id="inp-question" rows="2" oninput="renderQuestionCard()" class="w-full bg-white border-2 border-stone-300 rounded-xl px-3 py-2 text-zinc-900">资料质量、语言表达、渠道要求与审核流程分别占多大影响？应该先改源资料表，还是上本地化工作流？</textarea>
+                        <label class="text-stone-600 block mb-1">最希望共议想清楚什么？</label>
+                        <textarea id="inp-question" rows="2" oninput="renderQuestionCard()" class="w-full bg-white border-2 border-stone-300 rounded-xl px-3.5 py-2 text-zinc-900">问题出在源资料表还是翻译流程？先改源表还是上本地化工作流？</textarea>
                     </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs font-bold">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 text-xs font-bold">
                         <div>
-                            <label class="text-stone-600 block mb-1">可提供的脱敏材料</label>
-                            <input type="text" id="inp-mat" value="1份脱敏商品源资料表、2份修改五轮的返工文案" oninput="renderQuestionCard()" class="w-full bg-white border-2 border-stone-300 rounded-xl px-3 py-2 text-zinc-900">
+                            <label class="text-stone-600 block mb-1">可带脱敏证据</label>
+                            <input type="text" id="inp-mat" value="1份源商品表 + 2份改五轮的返工稿" oninput="renderQuestionCard()" class="w-full bg-white border-2 border-stone-300 rounded-xl px-3.5 py-2 text-zinc-900">
                         </div>
                         <div>
-                            <label class="text-stone-600 block mb-1">公开偏好 & 后续意愿</label>
-                            <select id="inp-pref" onchange="renderQuestionCard()" class="w-full bg-white border-2 border-stone-300 rounded-xl px-3 py-2 text-zinc-900">
-                                <option value="匿名摘要公开 | 参加月度共议讨论">匿名摘要公开 | 参加月度共议讨论</option>
-                                <option value="署名摘要公开 | 寻找共创与解题伙伴">署名摘要公开 | 寻找共创与解题伙伴</option>
-                                <option value="仅受控定向交流 | 先接受20分钟轻访谈">仅受控定向交流 | 先接受20分钟轻访谈</option>
+                            <label class="text-stone-600 block mb-1">公开与后续偏好</label>
+                            <select id="inp-pref" onchange="renderQuestionCard()" class="w-full bg-white border-2 border-stone-300 rounded-xl px-3.5 py-2 text-zinc-900">
+                                <option value="匿名摘要 | 参加月度共议">匿名摘要 | 参加月度共议</option>
+                                <option value="署名摘要 | 寻找解题伙伴">署名摘要 | 寻找解题伙伴</option>
+                                <option value="定向交流 | 20分钟轻访谈">定向交流 | 20分钟轻访谈</option>
                             </select>
                         </div>
                     </div>
                 </div>
 
                 <!-- Live OLED Preview of Question Card -->
-                <div class="lg:col-span-6 hardware-chassis p-6">
-                    <div class="oled-screen p-6 space-y-4">
+                <div class="lg:col-span-6 hardware-chassis p-7">
+                    <div class="oled-screen p-6 space-y-4" id="receipt-printer-box">
                         <div class="flex items-center justify-between border-b border-stone-800 pb-3">
                             <div class="flex items-center space-x-2">
-                                <span class="px-2.5 py-0.5 rounded bg-[#1E78FF] text-white text-xs font-bold">标准问题卡输出终端</span>
+                                <span class="px-2.5 py-0.5 rounded bg-[#1E78FF] text-white text-xs font-bold">热敏问题卡出票口</span>
                                 <span class="font-pixel text-lg pixel-green" id="card-preview-code">MLJB 001</span>
                             </div>
-                            <button onclick="copyCardText()" class="px-3 py-1.5 rounded-xl bg-[#FFEB14] text-zinc-950 text-xs font-extrabold border-b-2 border-yellow-600 active:translate-y-0.5 transition">
-                                <i class="fa-regular fa-copy mr-1"></i>
-                                <span id="copy-btn-text">复制问题卡</span>
+                            <button onclick="copyCardText()" class="px-3.5 py-1.5 rounded-xl bg-[#FFEB14] text-zinc-950 text-xs font-extrabold border-b-2 border-yellow-600 active:translate-y-0.5 transition">
+                                <i class="fa-solid fa-print mr-1"></i>
+                                <span id="copy-btn-text">打印/复制问题卡</span>
                             </button>
                         </div>
 
@@ -928,54 +826,50 @@
                             <!-- Rendered via JS -->
                         </div>
 
-                        <div class="p-3 rounded-xl bg-stone-900/90 border border-stone-800 text-[11px] text-stone-400 flex flex-wrap items-center justify-between gap-2">
-                            <span>SLA承诺：2个工作日确认收到，7个工作日反馈安排</span>
-                            <span class="pixel-green font-pixel text-sm">CANDIDATE_PRODUCT: NULL (待共议)</span>
+                        <div class="p-3 rounded-xl bg-stone-900/90 border border-stone-800 text-xs text-stone-400 flex flex-wrap items-center justify-between gap-2">
+                            <span>SLA：2工作日确认 / 7工作日反馈</span>
+                            <span class="pixel-green font-pixel text-sm">PRODUCT_LOCK: OFF</span>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- TAB 2: BIDDING EVALUATION CALCULATOR (P18 / P31) -->
-            <div id="tool-tab-eval" class="hidden grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-                <div class="lg:col-span-7 hardware-chassis p-6 sm:p-8 space-y-4">
-                    <div>
-                        <h3 class="font-black text-zinc-900 text-lg">候选解题团队简案评分器 (满分100分 · P18/P31)</h3>
-                        <p class="text-xs font-semibold text-stone-600">初选简案控制在2页以内，不要求报名专门开发或提交完整源代码；观众人气票不决定实施方。</p>
-                    </div>
-
-                    <div class="space-y-4 pt-2">
+            <!-- TAB 2: BIDDING EVALUATION CALCULATOR -->
+            <div id="tool-tab-eval" class="hidden grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                <div class="lg:col-span-7 hardware-chassis p-7 sm:p-8 space-y-4">
+                    <h3 class="font-black text-zinc-900 text-lg">候选解题团队简案评分器 (2页简案 · 不收源码)</h3>
+                    <div class="space-y-3.5 pt-1">
                         <div class="p-3.5 rounded-xl bg-white border border-stone-300">
                             <div class="flex justify-between text-xs font-extrabold mb-1.5">
-                                <span>1. 业务理解 (满分 30 分) — 理解实际任务、人工审核节点和例外</span>
+                                <span>1. 业务理解 (30分) — 实际任务、人工审核与例外</span>
                                 <span class="font-pixel text-lg px-2 rounded bg-zinc-900 text-[#FFEB14]" id="eval-val-1">25 / 30</span>
                             </div>
                             <input type="range" id="eval-s1" min="0" max="30" value="25" oninput="calcEval()" class="w-full cursor-pointer">
                         </div>
                         <div class="p-3.5 rounded-xl bg-white border border-stone-300">
                             <div class="flex justify-between text-xs font-extrabold mb-1.5">
-                                <span>2. 技术可行性 (满分 25 分) — 数据、系统接入、失败处理及测试可信</span>
+                                <span>2. 技术可行性 (25分) — 数据接入、异常兜底与测试</span>
                                 <span class="font-pixel text-lg px-2 rounded bg-zinc-900 text-sky-400" id="eval-val-2">20 / 25</span>
                             </div>
                             <input type="range" id="eval-s2" min="0" max="25" value="20" oninput="calcEval()" class="w-full cursor-pointer">
                         </div>
                         <div class="p-3.5 rounded-xl bg-white border border-stone-300">
                             <div class="flex justify-between text-xs font-extrabold mb-1.5">
-                                <span>3. 交付能力 (满分 20 分) — 实际人员、已有实现验证、交接及替代安排</span>
+                                <span>3. 交付能力 (20分) — 实际人员、交接与备援安排</span>
                                 <span class="font-pixel text-lg px-2 rounded bg-zinc-900 text-emerald-400" id="eval-val-3">16 / 20</span>
                             </div>
                             <input type="range" id="eval-s3" min="0" max="20" value="16" oninput="calcEval()" class="w-full cursor-pointer">
                         </div>
                         <div class="p-3.5 rounded-xl bg-white border border-stone-300">
                             <div class="flex justify-between text-xs font-extrabold mb-1.5">
-                                <span>4. 总成本及维护边界 (满分 15 分) — 调用/部署/维护透明，范围有边界</span>
+                                <span>4. 成本与维护 (15分) — 调用/部署/维护边界透明</span>
                                 <span class="font-pixel text-lg px-2 rounded bg-zinc-900 text-amber-400" id="eval-val-4">12 / 15</span>
                             </div>
                             <input type="range" id="eval-s4" min="0" max="15" value="12" oninput="calcEval()" class="w-full cursor-pointer">
                         </div>
                         <div class="p-3.5 rounded-xl bg-white border border-stone-300">
                             <div class="flex justify-between text-xs font-extrabold mb-1.5">
-                                <span>5. 协作与投入 (满分 10 分) — 统一答疑、反馈配合及真实可投入时间明确</span>
+                                <span>5. 协作投入 (10分) — 答疑配合及可投入时间</span>
                                 <span class="font-pixel text-lg px-2 rounded bg-zinc-900 text-pink-300" id="eval-val-5">9 / 10</span>
                             </div>
                             <input type="range" id="eval-s5" min="0" max="10" value="9" oninput="calcEval()" class="w-full cursor-pointer">
@@ -983,71 +877,55 @@
                     </div>
                 </div>
 
-                <div class="lg:col-span-5 hardware-chassis p-6">
-                    <div class="oled-screen p-6 space-y-5 text-center">
-                        <div class="text-xs font-pixel text-stone-400 uppercase tracking-widest">EVALUATION_SCORE_OUTPUT</div>
+                <div class="lg:col-span-5 hardware-chassis p-7">
+                    <div class="oled-screen p-7 space-y-5 text-center">
+                        <div class="text-xs font-pixel text-stone-400">EVALUATION_SCORE_OUTPUT</div>
                         <div class="text-7xl font-pixel pixel-green my-2" id="eval-total-score">82</div>
-                        <div class="text-xs font-bold px-3.5 py-1.5 rounded-full inline-block bg-emerald-500/20 text-emerald-300 border border-emerald-500/40" id="eval-verdict">
-                            推荐进入定向揭榜洽谈 (候选实施团队)
+                        <div class="text-xs font-bold px-4 py-1.5 rounded-full inline-block bg-emerald-500/20 text-emerald-300 border border-emerald-500/40" id="eval-verdict">
+                            推荐进入定向揭榜洽谈
                         </div>
                         <div class="text-left text-xs text-stone-300 space-y-2 pt-4 border-t border-stone-800 leading-relaxed">
-                            <p><strong>● 利益冲突回避规则：</strong>评审专家如与候选团队存在投资、雇佣或商业关系，须事先披露并在正式项目评价时回避。</p>
-                            <p><strong>● 知识产权保护：</strong>每题原则上邀请2-3支适配团队提交2页简案，不同团队核心方案不互相分发；未入选方案不作为免费实施资料转交。</p>
+                            <p>● 评审专家有商业关系须披露并回避。</p>
+                            <p>● 每题邀2-3支团队交2页简案，核心方案不互发。</p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- TAB 3: 90-DAY LAUNCH & 6 APPROVAL DECISIONS (P27-P28) -->
-            <div id="tool-tab-roadmap" class="hidden grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-                <!-- 90 Day Timeline -->
-                <div class="lg:col-span-7 hardware-chassis p-6 sm:p-8 space-y-4">
-                    <div class="flex flex-wrap items-center justify-between gap-2 border-b-2 border-stone-300 pb-3">
-                        <h3 class="font-black text-zinc-900 text-base sm:text-lg">首个 90 天启动排期 (含 FDE 补充动作 · P27/P35)</h3>
-                        <span class="text-xs font-extrabold px-2.5 py-1 rounded-lg bg-[#FFEB14] text-zinc-950">预算：¥16,000现金 + 24人日 (¥19,200)</span>
+            <!-- TAB 3: 90-DAY LAUNCH & 6 APPROVAL DECISIONS -->
+            <div id="tool-tab-roadmap" class="hidden grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                <div class="lg:col-span-7 hardware-chassis p-7 sm:p-8 space-y-4">
+                    <div class="flex items-center justify-between border-b-2 border-stone-300 pb-3">
+                        <h3 class="font-black text-zinc-900 text-base">首 90 天冲刺排期</h3>
+                        <span class="text-xs font-extrabold px-3 py-1 rounded-lg bg-[#FFEB14] text-zinc-950">¥16,000现金 + 24人日</span>
                     </div>
-                    <div class="space-y-2.5 text-xs" id="ninety-day-list">
-                        <!-- Populated by JS -->
-                    </div>
+                    <div class="space-y-2.5 text-xs" id="ninety-day-list"></div>
                 </div>
 
-                <!-- 6 Decisions Interactive Sign-off -->
-                <div class="lg:col-span-5 red-selection-frame white-device-card p-6 sm:p-8 space-y-4">
+                <div class="lg:col-span-5 red-selection-frame white-device-card p-7 sm:p-8 space-y-4">
                     <div class="red-corner rc-tl"></div>
                     <div class="red-corner rc-tr"></div>
                     <div class="red-corner rc-bl"></div>
                     <div class="red-corner rc-br"></div>
 
                     <div class="flex items-center justify-between">
-                        <h3 class="font-black text-zinc-950 text-base sm:text-lg">立项需确认的 6 个决定 (P28)</h3>
+                        <h3 class="font-black text-zinc-950 text-base">立项必拍板 6 项决定</h3>
                         <span class="font-pixel text-base px-2.5 py-0.5 rounded bg-zinc-900 text-[#22C55E]" id="decision-progress">6 / 6 CONFIRMED</span>
                     </div>
-                    <p class="text-xs font-semibold text-zinc-500">点击核查立项前提条件：</p>
-                    <div class="space-y-2.5 text-xs font-bold" id="decision-checklist">
-                        <!-- Populated by JS -->
-                    </div>
+                    <div class="space-y-2.5 text-xs font-bold" id="decision-checklist"></div>
                 </div>
             </div>
         </section>
 
     </main>
 
-    <!-- FOOTER -->
-    <footer class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16">
-        <div class="hardware-chassis p-6 sm:p-8 grid grid-cols-1 md:grid-cols-3 gap-6 text-xs text-stone-700">
-            <div class="space-y-1.5">
-                <div class="font-black text-zinc-900 text-sm">AGICamp 模力工场 · 模力揭榜计划 V2.1</div>
-                <p>企业出题 · 智囊共议 · FDE与OPC协作落地。完整映射《模力揭榜计划_全案策划方案 (2).docx》全部36页机制、表格与测算口径。</p>
-            </div>
-            <div class="space-y-1">
-                <div class="font-extrabold text-zinc-900">来源说明与机制参考 (P36)</div>
-                <p>[1] 极客邦科技，《企业有需求 FDE团队有能力 为什么AI项目仍难落地》，InfoQ，2026年10月22日。</p>
-                <p>[2] InnoCentive，Frequently Asked Questions（合作挑战与成果规则参考）。</p>
-                <p>[3] Palantir，Forward Deployed Software Engineer（FDE机制参考，2026年10月24日）。</p>
-            </div>
-            <div class="space-y-1">
-                <div class="font-extrabold text-zinc-900">合规与口径声明</div>
-                <p>财务示例统一按不含税口径；文中所列企业问题均为征题方向与策划示例，非已确认客户名单或订单。正式发布前需确认签约服务主体、可调用资源与售后安排。</p>
+    <!-- COMPACT HARDWARE FOOTER -->
+    <footer class="max-w-6xl w-full mx-auto px-4 sm:px-6 mt-12">
+        <div class="hardware-chassis px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-stone-600 font-bold">
+            <div>AGICamp 模力工场 · 模力揭榜计划 V2.1（企业出题 · 智囊共议 · FDE×OPC落地）</div>
+            <div class="flex items-center space-x-4 text-[11px]">
+                <span>参考：InfoQ [1] / InnoCentive [2] / Palantir FDE [3]</span>
+                <span class="px-2 py-0.5 rounded bg-stone-200 text-zinc-800">不含税测算口径</span>
             </div>
         </div>
     </footer>
@@ -1731,18 +1609,21 @@
         }
 
         function renderFdeSection() {
-            document.getElementById('role-matrix').innerHTML = roleMatrixData.map(r => `
-                <div onclick="playClick(760)" class="keycap ${r.style} justify-between space-y-2">
-                    <div class="z-10">
-                        <span class="text-[10px] font-extrabold px-2 py-0.5 rounded bg-black/15">${r.badge}</span>
-                        <div class="font-black text-base mt-1.5">${r.role}</div>
-                        <p class="text-xs opacity-90 mt-1 leading-relaxed">${r.duty}</p>
+            const roleEl = document.getElementById('role-matrix');
+            if (roleEl) {
+                roleEl.innerHTML = roleMatrixData.map(r => `
+                    <div onclick="playClick(760)" class="keycap ${r.style} justify-between space-y-2">
+                        <div class="z-10">
+                            <span class="text-[10px] font-extrabold px-2 py-0.5 rounded bg-black/15">${r.badge}</span>
+                            <div class="font-black text-base mt-1.5">${r.role}</div>
+                            <p class="text-xs opacity-90 mt-1 leading-relaxed">${r.duty}</p>
+                        </div>
+                        <div class="pt-2 border-t border-black/15 text-[11px] opacity-85 z-10">
+                            <strong>红线：</strong>${r.boundary}
+                        </div>
                     </div>
-                    <div class="pt-2 border-t border-black/15 text-[11px] opacity-85 z-10">
-                        <strong>红线：</strong>${r.boundary}
-                    </div>
-                </div>
-            `).join('');
+                `).join('');
+            }
 
             document.getElementById('fde-pipeline').innerHTML = fdePipelineData.map((p, idx) => `
                 <div onclick="selectFdeStep(${idx})" class="p-3.5 rounded-2xl cursor-pointer transition flex flex-col justify-between space-y-2 ${idx === activeFdeStep ? 'bg-[#1E78FF] text-white shadow-lg scale-[1.02]' : 'bg-stone-100 border-2 border-stone-200 hover:border-blue-400 text-zinc-900'}">
@@ -2017,9 +1898,45 @@
             document.getElementById('decision-progress').textContent = `${chks} / 6 CONFIRMED`;
         }
 
-        function scrollToSection(id) {
-            playClick(640);
-            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+        // --- Workstation Deck Mode Switcher (Eliminates Visual Crowding) ---
+        let currentDeck = 'deck-1';
+        let showAllDecks = false;
+
+        function switchDeck(deckId) {
+            playClick(680);
+            currentDeck = deckId;
+            showAllDecks = false;
+            document.getElementById('all-decks-label').textContent = '展开长图';
+
+            ['deck-1', 'deck-2', 'deck-3', 'deck-4', 'deck-5'].forEach((id, idx) => {
+                const sec = document.getElementById(id);
+                const btn = document.getElementById(`nav-${id}`);
+                const labels = ['01 · 9键总控', '02 · 行业翻牌', '03 · 档期与FDE', '04 · 盈亏调音', '05 · 打票与评测'];
+                if (id === deckId) {
+                    sec.classList.remove('hidden');
+                    btn.className = "px-3.5 py-2 rounded-xl bg-[#1E78FF] text-white border-b-4 border-[#05358A] active:translate-y-0.5 transition";
+                } else {
+                    sec.classList.add('hidden');
+                    btn.className = "px-3.5 py-2 rounded-xl bg-white text-zinc-800 border-b-4 border-stone-300 hover:border-blue-500 active:translate-y-0.5 transition";
+                }
+                btn.textContent = labels[idx];
+            });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function toggleAllDecks() {
+            playClick(760);
+            showAllDecks = !showAllDecks;
+            document.getElementById('all-decks-label').textContent = showAllDecks ? '收起为单屏' : '展开长图';
+            ['deck-1', 'deck-2', 'deck-3', 'deck-4', 'deck-5'].forEach(id => {
+                const sec = document.getElementById(id);
+                if (showAllDecks) {
+                    sec.classList.remove('hidden');
+                } else {
+                    if (id === currentDeck) sec.classList.remove('hidden');
+                    else sec.classList.add('hidden');
+                }
+            });
         }
 
         window.onload = function() {
