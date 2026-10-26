@@ -1,0 +1,2039 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AGICamp 模力工场 | 模力揭榜计划 V2.1 硬件级交互终端</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Sans+SC:wght@400;500;700;900&family=Silkscreen:wght@400;700&family=VT323&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Inter"', '"Noto Sans SC"', 'sans-serif'],
+                        pixel: ['"VT323"', '"Silkscreen"', 'monospace'],
+                    },
+                    colors: {
+                        chassis: {
+                            light: '#FAF7F0',
+                            DEFAULT: '#F2ECE1',
+                            dark: '#E2D9C8',
+                            edge: '#CFC3AE'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Reference 2: Sky-Blue Studio Backdrop */
+        body {
+            font-family: 'Inter', 'Noto Sans SC', sans-serif;
+            background: linear-gradient(180deg, #8CC0F4 0%, #B8D8F8 38%, #E6F1FC 78%, #F8FBFF 100%);
+            background-attachment: fixed;
+            color: #18181B;
+            overflow-x: hidden;
+        }
+
+        /* Reference 2: Red Vector Bounding Box & Corner Handles */
+        .red-selection-frame {
+            position: relative;
+            border: 1.5px solid #FF2E2E;
+        }
+        .red-corner {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: #FFFFFF;
+            border: 1.5px solid #FF2E2E;
+            z-index: 30;
+            pointer-events: none;
+        }
+        .rc-tl { top: -4.5px; left: -4.5px; }
+        .rc-tr { top: -4.5px; right: -4.5px; }
+        .rc-bl { bottom: -4.5px; left: -4.5px; }
+        .rc-br { bottom: -4.5px; right: -4.5px; }
+
+        /* Reference 1: Molded Cream Hardware Chassis */
+        .hardware-chassis {
+            background: linear-gradient(145deg, #FBF8F3 0%, #EFE9DC 100%);
+            border-radius: 36px;
+            box-shadow: 
+                0 28px 60px -12px rgba(18, 43, 74, 0.25),
+                0 10px 0 0 #D5C8B3,
+                inset 0 2px 3px rgba(255, 255, 255, 0.9),
+                inset 0 -3px 6px rgba(166, 151, 128, 0.35);
+            border: 1px solid #DFD5C5;
+        }
+
+        .white-device-card {
+            background: #FFFFFF;
+            border-radius: 40px;
+            box-shadow: 
+                0 25px 50px -12px rgba(29, 78, 137, 0.18),
+                inset 0 2px 4px rgba(255, 255, 255, 1);
+        }
+
+        /* Reference 1: Recessed Keywell (Socket for Keycaps) */
+        .keywell-grid {
+            background: #221E1A;
+            border-radius: 26px;
+            padding: 12px;
+            box-shadow: 
+                inset 0 5px 10px rgba(0,0,0,0.75),
+                0 2px 1px rgba(255,255,255,0.7);
+        }
+
+        /* Reference 1: 3D Sculpted Mechanical Keycaps */
+        .keycap {
+            position: relative;
+            border-radius: 20px;
+            padding: 14px 16px;
+            cursor: pointer;
+            user-select: none;
+            transition: transform 0.08s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.08s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        /* Inner Dish Highlight on Keycap Top */
+        .keycap::before {
+            content: "";
+            position: absolute;
+            inset: 5px 7px 9px 7px;
+            border-radius: 14px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.28) 0%, rgba(255,255,255,0.03) 100%);
+            pointer-events: none;
+        }
+        .keycap:active, .keycap.active-pressed {
+            transform: translateY(5px);
+        }
+
+        /* Keycap Color Themes (Exact Match to Image 1) */
+        .key-white {
+            background: linear-gradient(180deg, #FFFFFF 0%, #EFECE6 100%);
+            color: #18181B;
+            box-shadow: 0 7px 0 #C2BDB2, 0 10px 14px rgba(0,0,0,0.35), inset 0 2px 2px #FFFFFF;
+        }
+        .key-white:active, .key-white.active-pressed {
+            box-shadow: 0 2px 0 #C2BDB2, 0 4px 6px rgba(0,0,0,0.3), inset 0 2px 2px #FFFFFF;
+        }
+
+        .key-pink {
+            background: linear-gradient(180deg, #FCE7E2 0%, #F2CDC4 100%);
+            color: #27201C;
+            box-shadow: 0 7px 0 #C99D94, 0 10px 14px rgba(0,0,0,0.35), inset 0 2px 2px #FFF5F2;
+        }
+        .key-pink:active, .key-pink.active-pressed {
+            box-shadow: 0 2px 0 #C99D94, 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        .key-lilac {
+            background: linear-gradient(180deg, #F5E1FD 0%, #E2C2F0 100%);
+            color: #261B2E;
+            box-shadow: 0 7px 0 #B58EC7, 0 10px 14px rgba(0,0,0,0.35), inset 0 2px 2px #FDF5FF;
+        }
+        .key-lilac:active, .key-lilac.active-pressed {
+            box-shadow: 0 2px 0 #B58EC7, 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        .key-blue {
+            background: linear-gradient(180deg, #1E78FF 0%, #0956D6 100%);
+            color: #FFFFFF;
+            box-shadow: 0 7px 0 #05358A, 0 10px 14px rgba(0,0,0,0.38), inset 0 2px 3px rgba(255,255,255,0.45);
+        }
+        .key-blue:active, .key-blue.active-pressed {
+            box-shadow: 0 2px 0 #05358A, 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        .key-yellow {
+            background: linear-gradient(180deg, #FFEB14 0%, #EACC00 100%);
+            color: #211C00;
+            box-shadow: 0 7px 0 #B59900, 0 10px 14px rgba(0,0,0,0.35), inset 0 2px 3px rgba(255,255,255,0.65);
+        }
+        .key-yellow:active, .key-yellow.active-pressed {
+            box-shadow: 0 2px 0 #B59900, 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        .key-green {
+            background: linear-gradient(180deg, #09C62B 0%, #049E20 100%);
+            color: #FFFFFF;
+            box-shadow: 0 7px 0 #036814, 0 10px 14px rgba(0,0,0,0.38), inset 0 2px 3px rgba(255,255,255,0.45);
+        }
+        .key-green:active, .key-green.active-pressed {
+            box-shadow: 0 2px 0 #036814, 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        .key-peach {
+            background: linear-gradient(180deg, #FBD6BD 0%, #EEB996 100%);
+            color: #291D15;
+            box-shadow: 0 7px 0 #BF8B69, 0 10px 14px rgba(0,0,0,0.35), inset 0 2px 2px #FFF3EB;
+        }
+        .key-peach:active, .key-peach.active-pressed {
+            box-shadow: 0 2px 0 #BF8B69, 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        .key-coral {
+            background: linear-gradient(180deg, #FF9985 0%, #EE755F 100%);
+            color: #2B110C;
+            box-shadow: 0 7px 0 #BA4B37, 0 10px 14px rgba(0,0,0,0.35), inset 0 2px 3px rgba(255,255,255,0.45);
+        }
+        .key-coral:active, .key-coral.active-pressed {
+            box-shadow: 0 2px 0 #BA4B37, 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        /* Selected ring indicator on keycap */
+        .keycap-selected {
+            outline: 3px solid #FF2E2E;
+            outline-offset: 2px;
+        }
+
+        /* Reference 1: Retro OLED Dot-Matrix Screen */
+        .oled-screen {
+            background: #14171A;
+            border-radius: 26px 26px 12px 12px;
+            box-shadow: 
+                inset 0 6px 16px rgba(0,0,0,0.9),
+                inset 0 0 2px rgba(255,255,255,0.18),
+                0 2px 0 rgba(255,255,255,0.8);
+            border: 4px solid #26292E;
+            position: relative;
+            overflow: hidden;
+        }
+        /* Subtle CRT Scanline & Dot Matrix overlay */
+        .oled-screen::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 0);
+            background-size: 4px 4px;
+            pointer-events: none;
+        }
+        .pixel-text {
+            font-family: 'VT323', 'Noto Sans SC', monospace;
+            letter-spacing: 0.04em;
+            text-shadow: 0 0 8px rgba(226, 232, 240, 0.35);
+        }
+        .pixel-green {
+            color: #22C55E;
+            text-shadow: 0 0 8px rgba(34, 197, 94, 0.65);
+        }
+
+        /* Reference 1: Rotary Encoder Knob with Blue Neon Ring */
+        .rotary-housing {
+            width: 112px;
+            height: 112px;
+            border-radius: 9999px;
+            background: repeating-conic-gradient(#EBE4D8 0% 2%, #D4C9B8 2% 4%);
+            box-shadow: 
+                0 12px 24px rgba(0,0,0,0.28),
+                0 4px 0 #BFB39F,
+                inset 0 2px 3px rgba(255,255,255,0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            user-select: none;
+            transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .rotary-ring {
+            width: 94px;
+            height: 94px;
+            border-radius: 9999px;
+            border: 3.5px solid #4F46E5;
+            box-shadow: 0 0 12px rgba(79, 70, 229, 0.6), inset 0 0 8px rgba(79, 70, 229, 0.4);
+            background: linear-gradient(145deg, #FAF7F2 0%, #E7DFD1 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Reference 2: Recessed Sky-Blue Diorama Pill Window */
+        .diorama-pill {
+            background: linear-gradient(180deg, #74ADF0 0%, #B2D4FA 58%, #FFFFFF 86%, #F1F5F9 100%);
+            border-radius: 9999px;
+            box-shadow: 
+                inset 0 8px 16px rgba(19, 58, 107, 0.32),
+                inset 0 -3px 6px rgba(255, 255, 255, 0.9),
+                0 2px 4px rgba(0, 0, 0, 0.05);
+            border: 2px solid #E2E8F0;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.25s ease;
+        }
+        .diorama-pill:hover {
+            transform: scale(1.01);
+            box-shadow: 
+                inset 0 8px 18px rgba(19, 58, 107, 0.4),
+                0 8px 20px rgba(37, 99, 235, 0.14);
+        }
+        .diorama-pill.active-pill {
+            border-color: #FF2E2E;
+            box-shadow: 
+                inset 0 8px 16px rgba(19, 58, 107, 0.32),
+                0 0 0 3px rgba(255, 46, 46, 0.2);
+        }
+
+        /* Side Hardware Bumper Buttons (Reference 1 Left Side) */
+        .side-bumper-blue {
+            width: 12px;
+            height: 76px;
+            background: linear-gradient(90deg, #2563EB, #1D4ED8);
+            border-radius: 8px 0 0 8px;
+            box-shadow: inset 1px 1px 2px rgba(255,255,255,0.5), -2px 4px 8px rgba(0,0,0,0.2);
+        }
+        .side-knurled-wheel {
+            width: 22px;
+            height: 54px;
+            background: repeating-linear-gradient(180deg, #F5F0E6 0px, #F5F0E6 3px, #D6CBB9 3px, #D6CBB9 6px);
+            border-radius: 8px 0 0 8px;
+            box-shadow: -3px 5px 10px rgba(0,0,0,0.22);
+        }
+
+        /* Diorama Miniature Walker Bounce */
+        @keyframes walkerHop {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-6px) scale(1.18); }
+        }
+        .walker-hop {
+            animation: walkerHop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        /* Thermal Receipt Printer Animation */
+        @keyframes printReceipt {
+            0% { transform: translateY(-18px); opacity: 0.3; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+        .receipt-print-fx {
+            animation: printReceipt 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        /* Role Highlighting Pulse */
+        .role-highlight {
+            outline: 3px dashed #FF2E2E !important;
+            outline-offset: 6px;
+        }
+
+        /* Custom Range Slider */
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            height: 12px;
+            background: #221E1A;
+            border-radius: 999px;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.8);
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 26px;
+            height: 26px;
+            border-radius: 8px;
+            background: linear-gradient(180deg, #FFEB14 0%, #E5C100 100%);
+            border: 2px solid #18181B;
+            box-shadow: 0 3px 0 #9E8400, 0 4px 8px rgba(0,0,0,0.35);
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-blue-600 selection:text-white pb-20">
+
+    <!-- TOP HARDWARE BAR (Tactile Switch Bar) -->
+    <header class="sticky top-3 z-50 max-w-7xl mx-auto px-4">
+        <div class="hardware-chassis px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
+            <!-- Brand & LED Status -->
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-2xl bg-[#18181B] flex items-center justify-center text-[#22C55E] font-pixel text-xl shadow-inner border-2 border-stone-700">
+                    M_2.1
+                </div>
+                <div>
+                    <div class="flex items-center space-x-2">
+                        <span class="font-black text-base tracking-tight text-zinc-900">AGICamp 模力工场</span>
+                        <span class="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full bg-emerald-100 border border-emerald-400 text-[11px] font-bold text-emerald-900">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+                            <span>V2.1 FDE_OS</span>
+                        </span>
+                    </div>
+                    <p class="text-[11px] font-bold text-stone-600">真问题出题 · 智囊团共议 · FDE×OPC入企落地</p>
+                </div>
+            </div>
+
+            <!-- Quick Mechanical Jump Keys -->
+            <nav class="hidden xl:flex items-center space-x-1.5 text-xs font-extrabold">
+                <a href="#overview" onclick="playClick()" class="px-2.5 py-1.5 rounded-xl bg-white border-b-4 border-stone-300 hover:border-blue-500 active:translate-y-0.5 transition">01_9键总控</a>
+                <a href="#funnel-diorama" onclick="playClick()" class="px-2.5 py-1.5 rounded-xl bg-white border-b-4 border-stone-300 hover:border-blue-500 active:translate-y-0.5 transition">02_五阶微缩</a>
+                <a href="#scenarios" onclick="playClick()" class="px-2.5 py-1.5 rounded-xl bg-white border-b-4 border-stone-300 hover:border-blue-500 active:translate-y-0.5 transition">03_行业翻牌</a>
+                <a href="#calendar" onclick="playClick()" class="px-2.5 py-1.5 rounded-xl bg-white border-b-4 border-stone-300 hover:border-blue-500 active:translate-y-0.5 transition">04_档期合成</a>
+                <a href="#fde-opc" onclick="playClick()" class="px-2.5 py-1.5 rounded-xl bg-white border-b-4 border-stone-300 hover:border-blue-500 active:translate-y-0.5 transition">05_FDE通关</a>
+                <a href="#economics" onclick="playClick()" class="px-2.5 py-1.5 rounded-xl bg-white border-b-4 border-stone-300 hover:border-blue-500 active:translate-y-0.5 transition">06_盈亏调音</a>
+                <a href="#workbench" onclick="playClick()" class="px-2.5 py-1.5 rounded-xl bg-white border-b-4 border-stone-300 hover:border-blue-500 active:translate-y-0.5 transition">07_出票终端</a>
+            </nav>
+
+            <!-- Sound Toggle & Role Switcher -->
+            <div class="flex items-center space-x-2">
+                <span class="hidden md:inline-block text-[11px] font-pixel bg-stone-200 px-2 py-1 rounded-lg text-stone-700">支持键盘按 [1-9] 键触发</span>
+                <button onclick="toggleSound()" id="sound-btn" class="px-3 py-1.5 rounded-xl bg-stone-800 text-emerald-400 font-pixel text-sm border-b-4 border-black active:translate-y-0.5 transition flex items-center space-x-1.5" title="机械轴体音效开关">
+                    <i class="fa-solid fa-volume-high" id="sound-icon"></i>
+                    <span id="sound-label">SFX:ON</span>
+                </button>
+                <button onclick="scrollToSection('workbench')" class="px-3.5 py-1.5 rounded-xl bg-[#1E78FF] text-white text-xs font-extrabold border-b-4 border-[#05358A] active:translate-y-0.5 transition flex items-center space-x-1">
+                    <span>轻征题打票</span>
+                    <i class="fa-solid fa-print"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-14">
+
+        <!-- =========================================================================
+             HERO SECTION: REFERENCE 1 (RETRO 9-KEY MACRO PAD) + REFERENCE 2 (DIORAMA CARD)
+             ========================================================================= -->
+        <section id="overview" class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start pt-2">
+
+            <!-- LEFT COLUMN (7 Cols): Reference 1 Tactile Macro-Pad Console -->
+            <div class="lg:col-span-7 relative">
+                <!-- Left Side Hardware Bumpers (Interactive Randomizer & Volume) -->
+                <div onclick="randomMacroPress()" title="侧键：随机抽检一项核心机制" class="hidden sm:flex absolute -left-3 top-36 side-bumper-blue cursor-pointer active:translate-x-1 transition items-center justify-center text-white text-[10px] font-pixel">R</div>
+                <div onclick="rotateRoleKnob()" title="滚轮：切换阅读角色" class="hidden sm:block absolute -left-5 top-64 side-knurled-wheel cursor-pointer active:translate-x-1 transition"></div>
+
+                <div class="hardware-chassis p-5 sm:p-8 relative">
+                    <!-- Top Row: OLED Dot-Matrix Screen + Rotary Encoder Knob -->
+                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-5 mb-6">
+                        <!-- OLED Display -->
+                        <div class="oled-screen flex-1 p-5 min-h-[150px] flex flex-col justify-between">
+                            <div class="flex items-center justify-between text-xs font-pixel text-stone-400 border-b border-stone-800 pb-1.5">
+                                <span id="oled-tag">AGICAMP // 模力揭榜 V2.1</span>
+                                <span class="pixel-green" id="oled-role-indicator">MODE: ALL_VIEW</span>
+                            </div>
+                            <div class="my-2">
+                                <div class="text-xl sm:text-2xl font-bold text-white pixel-text leading-snug uppercase" id="oled-title">
+                                    BRING REAL PROBLEMS. CLARIFY NEXT STEP.
+                                </div>
+                                <p class="text-xs sm:text-sm text-emerald-300 mt-1.5 leading-relaxed font-bold" id="oled-desc">
+                                    按键盘 [1-9] 或点击下方立体键帽，3秒读懂全案核心机制；旋转右侧光环旋钮切换角色视角。
+                                </p>
+                            </div>
+                            <div class="flex items-center justify-between text-sm font-pixel pt-1">
+                                <span class="text-stone-400" id="oled-code">KEY: P1</span>
+                                <span class="text-amber-400" id="oled-metric">100真问题 → 12节点 → 12~18付费试点</span>
+                                <span class="pixel-green" id="oled-counter">01/09</span>
+                            </div>
+                        </div>
+
+                        <!-- Right Side Rotary Knob + Green Status LED -->
+                        <div class="flex sm:flex-col items-center justify-between sm:justify-center gap-3 shrink-0 self-center">
+                            <div onclick="rotateRoleKnob()" id="macro-knob" class="rotary-housing group" title="点击旋转切换视角 (全景/决策/运营/交付)">
+                                <div class="rotary-ring">
+                                    <svg class="w-11 h-11 text-zinc-900 group-hover:scale-105 transition" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M14 20C14 15.5817 17.5817 12 22 12H32C34.2091 12 36 13.7909 36 16V26C36 30.4183 32.4183 34 28 34H18C15.7909 34 14 32.2091 14 30V20Z" />
+                                        <path d="M12 24H26C28.2091 24 30 25.7909 30 28V36" />
+                                        <path d="M22 12V20C22 22.2091 23.7909 24 26 24H35" />
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <span class="w-3.5 h-3.5 rounded-full bg-[#16A34A] shadow-[0_0_10px_#22C55E] border border-emerald-900"></span>
+                                <span class="text-[11px] font-extrabold text-stone-600 uppercase tracking-wider" id="knob-label">旋钮:全景</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3x3 Sculpted Mechanical Keycaps Grid -->
+                    <div class="keywell-grid grid grid-cols-3 gap-3.5 sm:gap-4" id="hero-keypad">
+                        <!-- Populated dynamically via JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN (5 Cols): Reference 2 White Framed Card with Sky-Blue Diorama Pills -->
+            <div class="lg:col-span-5">
+                <div class="text-xs font-bold tracking-tight text-zinc-800 mb-1.5 flex items-center justify-between px-1">
+                    <span>moli_jiebang_v2.1</span>
+                    <button onclick="advanceDioramaStep()" class="text-red-600 hover:underline font-mono font-extrabold">[点击推进小人通关 ➔]</button>
+                </div>
+
+                <!-- Red Bounding Box Container -->
+                <div id="funnel-diorama" class="red-selection-frame white-device-card p-6 sm:p-8 relative">
+                    <div class="red-corner rc-tl"></div>
+                    <div class="red-corner rc-tr"></div>
+                    <div class="red-corner rc-bl"></div>
+                    <div class="red-corner rc-br"></div>
+
+                    <!-- Top Camera Notch Detail (Reference 2) -->
+                    <div class="w-36 h-5 bg-[#B2D4FA] rounded-b-2xl mx-auto -mt-6 sm:-mt-8 mb-5 shadow-inner"></div>
+
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs font-extrabold uppercase tracking-wider text-blue-700">五阶需求通关微缩窗 · 点胶囊切阶段</span>
+                        <span class="text-[11px] font-pixel text-zinc-500">NO_FAKE_LEADS</span>
+                    </div>
+
+                    <!-- 5 Recessed Diorama Pill Windows -->
+                    <div class="space-y-3" id="diorama-pills-container">
+                        <!-- Populated via JS -->
+                    </div>
+
+                    <!-- Selected Funnel Stage Detail Box -->
+                    <div id="diorama-stage-detail" class="mt-4 p-3.5 rounded-2xl bg-stone-100 border border-stone-200/80 text-xs space-y-1">
+                        <!-- Populated via JS -->
+                    </div>
+
+                    <!-- Bold Bottom Typography + Oversized Hand Cursor (Reference 2) -->
+                    <div class="mt-5 pt-3 border-t border-zinc-100 flex items-end justify-between relative">
+                        <div>
+                            <div class="text-3xl sm:text-4xl font-black tracking-tight text-zinc-950 leading-none">
+                                AGICamp26
+                            </div>
+                            <div class="text-2xl sm:text-3xl font-extrabold tracking-tight text-zinc-900 mt-1 flex items-center">
+                                <span>模力揭榜</span>
+                                <span class="ml-1 inline-block border-b-4 border-zinc-900 leading-none pb-0.5">↓</span>
+                            </div>
+                        </div>
+                        <div class="text-right text-[11px] font-bold text-zinc-500">
+                            <div>不逼当场签约</div>
+                            <div>先想清楚下一步</div>
+                        </div>
+
+                        <!-- Iconic Bold Outlined Hand Pointer SVG (Click advances funnel!) -->
+                        <svg onclick="advanceDioramaStep()" title="点击手势：推进需求通关下一阶段" class="w-14 h-14 text-zinc-950 cursor-pointer hover:scale-110 active:scale-95 transition-transform -mb-10 -mr-4 drop-shadow-md" viewBox="0 0 64 64" fill="#FFFFFF" stroke="#18181B" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M26 12C26 9.23858 28.2386 7 31 7C33.7614 7 36 9.23858 36 12V28H39C41.7614 28 44 30.2386 44 33V34H47C49.7614 34 52 36.2386 52 39V46C52 53.732 45.732 60 38 60H27C20.9249 60 16 55.0751 16 49V37C16 34.2386 18.2386 32 21 32H26V12Z"/>
+                            <line x1="34" y1="42" x2="34" y2="50" />
+                            <line x1="40" y1="42" x2="40" y2="50" />
+                            <line x1="46" y1="43" x2="46" y2="50" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- =========================================================================
+             SECTION 02: 3D INDUSTRY / SCENARIO / PRODUCT KEYPAD (P5-P7 / P21)
+             ========================================================================= -->
+        <section id="scenarios" class="space-y-5 role-section" data-roles="ops delivery">
+            <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+                <div>
+                    <span class="text-xs font-extrabold uppercase tracking-wider text-blue-900 bg-white/70 px-2.5 py-1 rounded-md">Section 02 · 三维选题与8大行业翻牌器 (点击键帽翻转看【会前证据】)</span>
+                    <h2 class="text-2xl sm:text-3xl font-black text-zinc-900 mt-1.5">按行业找人 · 按场景拆事 · 按边界定产品</h2>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="filterIndustry('all')" id="btn-ind-all" class="px-3.5 py-1.5 rounded-xl text-xs font-extrabold bg-[#1E78FF] text-white border-b-4 border-[#05358A] active:translate-y-0.5 transition">全部8大行业</button>
+                    <button onclick="filterIndustry('priority')" id="btn-ind-pri" class="px-3.5 py-1.5 rounded-xl text-xs font-extrabold bg-[#FFEB14] text-zinc-900 border-b-4 border-[#B59900] active:translate-y-0.5 transition">★ 首阶段优先 (2)</button>
+                </div>
+            </div>
+
+            <!-- 3 Dimensions Ultra-Crisp Pill Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="hardware-chassis p-4 flex items-center space-x-3.5">
+                    <div class="w-10 h-10 rounded-xl bg-[#1E78FF] text-white font-pixel text-xl flex items-center justify-center shrink-0 shadow">D1</div>
+                    <div>
+                        <div class="text-sm font-black text-zinc-900">行业维度：找相似背景的人</div>
+                        <p class="text-xs text-stone-600">谁在什么环境遇阻 → 锁定同业邀约名单</p>
+                    </div>
+                </div>
+                <div class="hardware-chassis p-4 flex items-center space-x-3.5">
+                    <div class="w-10 h-10 rounded-xl bg-[#FFEB14] text-zinc-900 font-pixel text-xl flex items-center justify-center shrink-0 shadow">D2</div>
+                    <div>
+                        <div class="text-sm font-black text-zinc-900">场景维度：核实哪一步卡住</div>
+                        <p class="text-xs text-stone-600">先看脱敏证据与流程 → 不预设必做Agent</p>
+                    </div>
+                </div>
+                <div class="hardware-chassis p-4 flex items-center space-x-3.5">
+                    <div class="w-10 h-10 rounded-xl bg-[#09C62B] text-white font-pixel text-xl flex items-center justify-center shrink-0 shadow">D3</div>
+                    <div>
+                        <div class="text-sm font-black text-zinc-900">产品维度：明确输入与验收</div>
+                        <p class="text-xs text-stone-600">边界清晰才转需求 → 匹配OPC与FDE组件</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 8 Industry Tactile Flip Keycaps Grid -->
+            <div class="keywell-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" id="industry-grid">
+                <!-- Populated by JS (Interactive Flip Cards) -->
+            </div>
+
+            <!-- Benchmark First Pilot Showcase (MLJB 001 - P21) -->
+            <div class="red-selection-frame white-device-card p-6 sm:p-7">
+                <div class="red-corner rc-tl"></div>
+                <div class="red-corner rc-tr"></div>
+                <div class="red-corner rc-bl"></div>
+                <div class="red-corner rc-br"></div>
+
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                    <div class="space-y-2 lg:max-w-2xl">
+                        <div class="inline-flex flex-wrap items-center gap-2 text-xs font-extrabold">
+                            <span class="px-2.5 py-0.5 rounded-lg bg-[#FFEB14] text-zinc-950 border border-yellow-600">首期标杆试点 MLJB 001</span>
+                            <span class="px-2.5 py-0.5 rounded-lg bg-stone-100 text-stone-700 font-mono">1品类 × 2市场 × 60样本(20调+40测) × 3周</span>
+                        </div>
+                        <h3 class="text-lg sm:text-xl font-black text-zinc-950">“一个商品，怎么讲给不同市场听” · 出海电商本地化验证</h3>
+                        <p class="text-xs text-zinc-600 leading-relaxed">
+                            <strong>FDE×OPC动作：</strong>FDE跟岗实测翻译审核工时、适配商品事实表；OPC提供内容工作流。<strong>红线边界：</strong>不含自动发布、不含ERP重度集成、不含自动法律合规裁决。
+                        </p>
+                    </div>
+                    <div class="grid grid-cols-3 gap-3 shrink-0">
+                        <div onclick="playClick(920)" class="keycap key-green text-center items-center justify-center min-w-[100px]">
+                            <div class="text-2xl sm:text-3xl font-black font-pixel">-30%</div>
+                            <div class="text-[11px] font-bold mt-1">合格稿工时</div>
+                        </div>
+                        <div onclick="playClick(960)" class="keycap key-blue text-center items-center justify-center min-w-[100px]">
+                            <div class="text-2xl sm:text-3xl font-black font-pixel">≥98%</div>
+                            <div class="text-[11px] font-bold mt-1">规格准确率</div>
+                        </div>
+                        <div onclick="playClick(1000)" class="keycap key-yellow text-center items-center justify-center min-w-[100px]">
+                            <div class="text-2xl sm:text-3xl font-black font-pixel">0_ERR</div>
+                            <div class="text-[11px] font-bold mt-1">重大事实错误</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- =========================================================================
+             SECTION 03: 12-MONTH ACTIVITY SEQUENCER & AGENDA SIMULATOR (P8-P12)
+             ========================================================================= -->
+        <section id="calendar" class="space-y-5 role-section" data-roles="ops">
+            <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+                <div>
+                    <span class="text-xs font-extrabold uppercase tracking-wider text-blue-900 bg-white/70 px-2.5 py-1 rounded-md">Section 03 · 12节点档期合成器 (点击月份在下方屏幕看产出)</span>
+                    <h2 class="text-2xl sm:text-3xl font-black text-zinc-900 mt-1.5">月度发现问题 · 季度拆解任务 · 半年度回访揭榜</h2>
+                </div>
+                <div class="flex flex-wrap gap-2 text-xs font-extrabold">
+                    <span class="px-3 py-1 rounded-xl bg-white border-b-2 border-stone-300 text-zinc-800">8场月度 (20人/2h)</span>
+                    <span class="px-3 py-1 rounded-xl bg-[#1E78FF] text-white">2场季度 (40人/3h)</span>
+                    <span class="px-3 py-1 rounded-xl bg-[#FFEB14] text-zinc-900">2场共创节 (100人/1d)</span>
+                </div>
+            </div>
+
+            <!-- 12 Months Hardware Sequencer Keys + Live Status Strip -->
+            <div class="hardware-chassis p-5 sm:p-6 space-y-4">
+                <div class="oled-screen px-5 py-3 flex flex-wrap items-center justify-between gap-2 text-xs">
+                    <div class="flex items-center space-x-2">
+                        <span class="pixel-green font-pixel text-base" id="cal-oled-month">M01 // 月度专场</span>
+                        <span class="text-white font-bold" id="cal-oled-theme">出海电商内容本地化</span>
+                    </div>
+                    <div class="text-amber-300 font-medium" id="cal-oled-out">核心产出：源资料、文案审核与返工困惑问题卡</div>
+                </div>
+                <div class="keywell-grid grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3" id="calendar-grid">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- Event Format & Auto-Play Agenda Simulator -->
+            <div class="hardware-chassis p-6 sm:p-7">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b-2 border-stone-300">
+                    <div>
+                        <h3 class="text-lg sm:text-xl font-black text-zinc-900" id="agenda-title">月度主题专场 · 120分钟沙盘推演</h3>
+                        <p class="text-xs font-bold text-stone-600 mt-0.5" id="agenda-subtitle">20人黄金配比：发题企3 + 同行5 + OPC6 + 智囊3 + 主持记录3</p>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <button onclick="playAgendaSimulation()" id="btn-agenda-play" class="px-3.5 py-2 rounded-xl text-xs font-extrabold bg-[#09C62B] text-white border-b-4 border-[#036814] active:translate-y-0.5 transition flex items-center space-x-1">
+                            <i class="fa-solid fa-play"></i>
+                            <span>自动推演环节</span>
+                        </button>
+                        <button onclick="switchAgenda('monthly')" id="btn-agenda-monthly" class="px-3 py-2 rounded-xl text-xs font-extrabold bg-[#1E78FF] text-white border-b-4 border-[#05358A] transition">月度(2h)</button>
+                        <button onclick="switchAgenda('quarterly')" id="btn-agenda-quarterly" class="px-3 py-2 rounded-xl text-xs font-extrabold bg-white text-zinc-800 border-b-4 border-stone-300 transition">季度(3h)</button>
+                        <button onclick="switchAgenda('festival')" id="btn-agenda-festival" class="px-3 py-2 rounded-xl text-xs font-extrabold bg-white text-zinc-800 border-b-4 border-stone-300 transition">共创节(1d)</button>
+                    </div>
+                </div>
+
+                <div class="mt-5 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                    <div class="lg:col-span-8 space-y-2" id="agenda-steps">
+                        <!-- Populated by JS -->
+                    </div>
+                    <div class="lg:col-span-4 oled-screen p-5 space-y-3" id="agenda-rules">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- =========================================================================
+             SECTION 04: FDE x OPC COLLABORATION DIORAMA & KEYCAPS (P16-17 / P32-35)
+             ========================================================================= -->
+        <section id="fde-opc" class="space-y-5 role-section" data-roles="delivery exec">
+            <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+                <div>
+                    <span class="text-xs font-extrabold uppercase tracking-wider text-blue-900 bg-white/70 px-2.5 py-1 rounded-md">Section 04 · FDE前线部署工程师 × OPC 协同矩阵</span>
+                    <h2 class="text-2xl sm:text-3xl font-black text-zinc-900 mt-1.5">揭榜找真题 · 智囊做判断 · FDE驻场联调OPC交付</h2>
+                </div>
+                <span class="text-xs font-extrabold text-red-700 bg-red-50 border border-red-200 px-3 py-1 rounded-lg">红线：1名主责FDE同期仅1个试点 | 1名PM最多并行2个</span>
+            </div>
+
+            <!-- 5 Role Matrix Keycaps -->
+            <div class="keywell-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5" id="role-matrix">
+                <!-- Populated by JS -->
+            </div>
+
+            <!-- Interactive FDE 6-Step Stepper -->
+            <div class="red-selection-frame white-device-card p-6 sm:p-7">
+                <div class="red-corner rc-tl"></div>
+                <div class="red-corner rc-tr"></div>
+                <div class="red-corner rc-bl"></div>
+                <div class="red-corner rc-br"></div>
+
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-5">
+                    <div>
+                        <h3 class="text-lg sm:text-xl font-black text-zinc-950 flex items-center">
+                            <span class="w-7 h-7 rounded-lg bg-[#1E78FF] text-white font-pixel text-base flex items-center justify-center mr-2">6X</span>
+                            FDE 入企实施六步通关闸门 (点击任意阶段点亮核查)
+                        </h3>
+                    </div>
+                    <span class="text-xs font-bold text-zinc-500">必配“企业业务搭档” · 每周演示可运行结果</span>
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3" id="fde-pipeline">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- =========================================================================
+             SECTION 05: FINANCIAL MIXER & UNIT ECONOMICS CONSOLE (P22, P23, P34)
+             ========================================================================= -->
+        <section id="economics" class="space-y-5 role-section" data-roles="exec delivery">
+            <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+                <div>
+                    <span class="text-xs font-extrabold uppercase tracking-wider text-blue-900 bg-white/70 px-2.5 py-1 rounded-md">Section 05 · 营收与盈亏平衡硬件调音台</span>
+                    <h2 class="text-2xl sm:text-3xl font-black text-zinc-900 mt-1.5">拨动推子实时测算：19个轻量试点覆盖全年公共成本</h2>
+                </div>
+                <span class="text-xs font-bold px-3 py-1 rounded-lg bg-white/80 text-zinc-700">不含税口径 | 运营 ¥800/人日 | FDE ¥1,500/人日</span>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Left Controls: Tactile Hardware Sliders -->
+                <div class="lg:col-span-7 hardware-chassis p-6 sm:p-7 space-y-5">
+                    <div class="flex flex-wrap items-center justify-between gap-2 border-b-2 border-stone-300 pb-3.5">
+                        <h3 class="font-black text-zinc-900 text-base">情景预设键：一键载入业务参数</h3>
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="applyPreset('90days')" class="px-3 py-1.5 rounded-xl bg-white border-b-4 border-stone-300 text-xs font-extrabold text-zinc-800 active:translate-y-0.5 transition">首90天验证</button>
+                            <button onclick="applyPreset('base18')" class="px-3 py-1.5 rounded-xl bg-[#1E78FF] border-b-4 border-[#05358A] text-xs font-extrabold text-white active:translate-y-0.5 transition">首年基准(18试点)</button>
+                            <button onclick="applyPreset('fdeMix')" class="px-3 py-1.5 rounded-xl bg-[#09C62B] border-b-4 border-[#036814] text-xs font-extrabold text-white active:translate-y-0.5 transition">FDE混合进阶</button>
+                        </div>
+                    </div>
+
+                    <!-- Sliders -->
+                    <div class="space-y-4">
+                        <div class="p-3.5 rounded-2xl bg-white/80 border border-stone-300">
+                            <div class="flex justify-between text-xs sm:text-sm mb-1.5">
+                                <span class="text-zinc-900 font-extrabold">1. 轻量场景试点 (报价 ¥50k / 毛利贡献 ¥12k)</span>
+                                <span class="font-pixel text-xl px-2.5 py-0.5 rounded bg-zinc-900 text-[#FFEB14]" id="val-light-pilots">18 个</span>
+                            </div>
+                            <input type="range" id="slider-light" min="0" max="30" value="18" oninput="updateFinancials()" class="w-full cursor-pointer">
+                        </div>
+
+                        <div class="p-3.5 rounded-2xl bg-white/80 border border-stone-300">
+                            <div class="flex justify-between text-xs sm:text-sm mb-1.5">
+                                <span class="text-zinc-900 font-extrabold">2. FDE 入企诊断 (报价 ¥15k / 5人日 / 贡献 ¥5k)</span>
+                                <span class="font-pixel text-xl px-2.5 py-0.5 rounded bg-zinc-900 text-sky-400" id="val-fde-diag">0 个</span>
+                            </div>
+                            <input type="range" id="slider-diag" min="0" max="20" value="0" oninput="updateFinancials()" class="w-full cursor-pointer">
+                        </div>
+
+                        <div class="p-3.5 rounded-2xl bg-white/80 border border-stone-300">
+                            <div class="flex justify-between text-xs sm:text-sm mb-1.5">
+                                <span class="text-zinc-900 font-extrabold">3. FDE 深度试点 (报价 ¥80k / 12人日+OPC / 贡献 ¥24k)</span>
+                                <span class="font-pixel text-xl px-2.5 py-0.5 rounded bg-zinc-900 text-emerald-400" id="val-fde-pilots">0 个</span>
+                            </div>
+                            <input type="range" id="slider-fde" min="0" max="15" value="0" oninput="updateFinancials()" class="w-full cursor-pointer">
+                        </div>
+
+                        <div class="grid grid-cols-3 gap-3">
+                            <div class="p-2.5 rounded-xl bg-white border border-stone-300">
+                                <label class="block text-[11px] font-bold text-stone-600 mb-1">月度 (¥3k+6d)</label>
+                                <input type="number" id="num-monthly" min="0" max="12" value="8" onchange="updateFinancials()" class="w-full bg-stone-900 font-pixel text-lg rounded-lg px-2.5 py-0.5 text-white">
+                            </div>
+                            <div class="p-2.5 rounded-xl bg-white border border-stone-300">
+                                <label class="block text-[11px] font-bold text-stone-600 mb-1">季度 (¥10k+12d)</label>
+                                <input type="number" id="num-quarterly" min="0" max="4" value="2" onchange="updateFinancials()" class="w-full bg-stone-900 font-pixel text-lg rounded-lg px-2.5 py-0.5 text-white">
+                            </div>
+                            <div class="p-2.5 rounded-xl bg-white border border-stone-300">
+                                <label class="block text-[11px] font-bold text-stone-600 mb-1">共创节 (¥40k+25d)</label>
+                                <input type="number" id="num-festival" min="0" max="2" value="2" onchange="updateFinancials()" class="w-full bg-stone-900 font-pixel text-lg rounded-lg px-2.5 py-0.5 text-white">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Output: OLED Financial Terminal -->
+                <div class="lg:col-span-5 hardware-chassis p-6 flex flex-col justify-between">
+                    <div class="oled-screen p-5 h-full flex flex-col justify-between space-y-4">
+                        <div>
+                            <div class="flex items-center justify-between border-b border-stone-800 pb-2.5 mb-3">
+                                <span class="font-pixel text-base text-stone-400">FIN_MIXER // 经营看板</span>
+                                <span id="fin-status-badge" class="text-xs font-bold px-2.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40">接近盈亏平衡</span>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-2.5 mb-4">
+                                <div class="p-3 rounded-xl bg-stone-900/90 border border-stone-800">
+                                    <div class="text-[11px] text-stone-400">合同总营收</div>
+                                    <div class="text-2xl font-pixel text-white" id="out-total-rev">¥900,000</div>
+                                </div>
+                                <div class="p-3 rounded-xl bg-stone-900/90 border border-stone-800">
+                                    <div class="text-[11px] text-stone-400">项目直接贡献</div>
+                                    <div class="text-2xl font-pixel pixel-green" id="out-project-contrib">¥216,000</div>
+                                </div>
+                                <div class="p-3 rounded-xl bg-stone-900/90 border border-stone-800">
+                                    <div class="text-[11px] text-stone-400">公共现金+人力</div>
+                                    <div class="text-2xl font-pixel text-rose-400" id="out-public-cost">¥221,600</div>
+                                    <div class="text-[10px] text-stone-400" id="out-public-detail">现金 ¥124,000 + 122d</div>
+                                </div>
+                                <div class="p-3 rounded-xl bg-stone-900/90 border border-stone-800">
+                                    <div class="text-[11px] text-stone-400">扣公共成本净额</div>
+                                    <div class="text-2xl font-pixel text-amber-400" id="out-net-balance">-¥5,600</div>
+                                    <div class="text-[10px] text-stone-400">不含固定费与赞助</div>
+                                </div>
+                            </div>
+
+                            <div class="text-xs border-t border-stone-800 pt-3 space-y-1.5">
+                                <div class="grid grid-cols-3 text-stone-400 pb-1 border-b border-stone-800">
+                                    <span>单项目拆解</span>
+                                    <span class="text-right">轻量(¥50k)</span>
+                                    <span class="text-right text-sky-300">FDE(¥80k)</span>
+                                </div>
+                                <div class="grid grid-cols-3 text-stone-300">
+                                    <span>OPC外部采购</span>
+                                    <span class="text-right font-mono">¥28,000</span>
+                                    <span class="text-right font-mono">¥28,000</span>
+                                </div>
+                                <div class="grid grid-cols-3 text-stone-300">
+                                    <span>FDE现场工程</span>
+                                    <span class="text-right text-stone-500">含于PM</span>
+                                    <span class="text-right text-sky-300 font-mono">¥18,000</span>
+                                </div>
+                                <div class="grid grid-cols-3 text-stone-300">
+                                    <span>PM/专家/测试</span>
+                                    <span class="text-right font-mono">¥10,000</span>
+                                    <span class="text-right font-mono">¥10,000</span>
+                                </div>
+                                <div class="grid grid-cols-3 font-bold text-emerald-400 pt-1 border-t border-stone-800">
+                                    <span>单项目贡献</span>
+                                    <span class="text-right font-mono">¥12,000(24%)</span>
+                                    <span class="text-right font-mono">¥24,000(30%)</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between text-xs font-pixel text-stone-500 pt-2 border-t border-stone-800">
+                            <span>付款建议: 50%启动 / 30%中期 / 20%验收</span>
+                            <span class="pixel-green">READY</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- =========================================================================
+             SECTION 06: INTERACTIVE WORKBENCH & TEMPLATES (P27-P31)
+             ========================================================================= -->
+        
+
+        <!-- =========================================================================
+             SECTION 03: 12-MONTH ACTIVITY SEQUENCER & AGENDA SIMULATOR (P8-P12)
+             ========================================================================= -->
+        
+
+        <!-- =========================================================================
+             SECTION 04: FDE x OPC COLLABORATION DIORAMA & KEYCAPS (P16-17 / P32-35)
+             ========================================================================= -->
+        
+
+        <!-- =========================================================================
+             SECTION 05: FINANCIAL MIXER & UNIT ECONOMICS CONSOLE (P22, P23, P34)
+             ========================================================================= -->
+        
+
+        <!-- =========================================================================
+             SECTION 06: INTERACTIVE WORKBENCH & TEMPLATES (P27-P31)
+             ========================================================================= -->
+        <section id="workbench" class="space-y-6 role-section" data-roles="ops delivery exec">
+            <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+                <div>
+                    <span class="text-xs font-extrabold uppercase tracking-wider text-blue-900 bg-white/70 px-2.5 py-1 rounded-md">Section 06 · 可复制工作模板与立项决策终端 (P27-P31)</span>
+                    <h2 class="text-2xl sm:text-3xl font-black text-zinc-900 mt-2">轻征题生成问题卡 · 揭榜100分制评测器 · 90天启动与立项6项决定</h2>
+                </div>
+            </div>
+
+            <!-- Workbench Mechanical Tabs -->
+            <div class="flex flex-wrap gap-3">
+                <button onclick="switchToolTab('card')" id="tab-btn-card" class="px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-black bg-[#1E78FF] text-white border-b-4 border-[#05358A] active:translate-y-0.5 transition">
+                    P29 · 附录一：企业轻征题 & 问题卡生成器
+                </button>
+                <button onclick="switchToolTab('eval')" id="tab-btn-eval" class="px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-black bg-white text-zinc-800 border-b-4 border-stone-300 active:translate-y-0.5 transition">
+                    P31 · 附录三：自愿揭榜100分制评测器
+                </button>
+                <button onclick="switchToolTab('roadmap')" id="tab-btn-roadmap" class="px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-black bg-white text-zinc-800 border-b-4 border-stone-300 active:translate-y-0.5 transition">
+                    P27-28 · 首90天排期 & 立项6项决定核查
+                </button>
+            </div>
+
+            <!-- TAB 1: QUESTION CARD GENERATOR -->
+            <div id="tool-tab-card" class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                <div class="lg:col-span-6 hardware-chassis p-6 sm:p-8 space-y-4">
+                    <div class="flex items-center justify-between border-b-2 border-stone-300 pb-3">
+                        <h3 class="font-black text-zinc-900 text-base">填写企业轻征题表 (第一阶段不问预算)</h3>
+                        <button onclick="fillSampleCard()" class="px-3 py-1 rounded-lg bg-[#FFEB14] text-zinc-900 font-extrabold text-xs border-b-2 border-yellow-600 active:translate-y-0.5">切换行业样例 ↻</button>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs font-bold">
+                        <div>
+                            <label class="text-stone-600 block mb-1">问题编号 & 匿名代号</label>
+                            <input type="text" id="inp-code" value="MLJB 001 | 某出海家居电商团队" oninput="renderQuestionCard()" class="w-full bg-white border-2 border-stone-300 rounded-xl px-3 py-2 text-zinc-900">
+                        </div>
+                        <div>
+                            <label class="text-stone-600 block mb-1">所属行业与责任部门</label>
+                            <input type="text" id="inp-ind" value="出海电商 · 多语言内容运营部" oninput="renderQuestionCard()" class="w-full bg-white border-2 border-stone-300 rounded-xl px-3 py-2 text-zinc-900">
+                        </div>
+                    </div>
+                    <div class="text-xs font-bold">
+                        <label class="text-stone-600 block mb-1">最近一次卡住的具体经历与影响频次</label>
+                        <textarea id="inp-story" rows="2" oninput="renderQuestionCard()" class="w-full bg-white border-2 border-stone-300 rounded-xl px-3 py-2 text-zinc-900">同一份商品资料需适配欧美日多个市场，用大模型生成首稿很快，但合规审核、规格核对和本地化表达返工仍然耗时，每周积压上百款新品。</textarea>
+                    </div>
+                    <div class="text-xs font-bold">
+                        <label class="text-stone-600 block mb-1">最希望大家帮你想清楚什么？（核心困惑）</label>
+                        <textarea id="inp-question" rows="2" oninput="renderQuestionCard()" class="w-full bg-white border-2 border-stone-300 rounded-xl px-3 py-2 text-zinc-900">资料质量、语言表达、渠道要求与审核流程分别占多大影响？应该先改源资料表，还是上本地化工作流？</textarea>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs font-bold">
+                        <div>
+                            <label class="text-stone-600 block mb-1">可提供的脱敏材料</label>
+                            <input type="text" id="inp-mat" value="1份脱敏商品源资料表、2份修改五轮的返工文案" oninput="renderQuestionCard()" class="w-full bg-white border-2 border-stone-300 rounded-xl px-3 py-2 text-zinc-900">
+                        </div>
+                        <div>
+                            <label class="text-stone-600 block mb-1">公开偏好 & 后续意愿</label>
+                            <select id="inp-pref" onchange="renderQuestionCard()" class="w-full bg-white border-2 border-stone-300 rounded-xl px-3 py-2 text-zinc-900">
+                                <option value="匿名摘要公开 | 参加月度共议讨论">匿名摘要公开 | 参加月度共议讨论</option>
+                                <option value="署名摘要公开 | 寻找共创与解题伙伴">署名摘要公开 | 寻找共创与解题伙伴</option>
+                                <option value="仅受控定向交流 | 先接受20分钟轻访谈">仅受控定向交流 | 先接受20分钟轻访谈</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live OLED Preview of Question Card -->
+                <div class="lg:col-span-6 hardware-chassis p-6">
+                    <div class="oled-screen p-6 space-y-4">
+                        <div class="flex items-center justify-between border-b border-stone-800 pb-3">
+                            <div class="flex items-center space-x-2">
+                                <span class="px-2.5 py-0.5 rounded bg-[#1E78FF] text-white text-xs font-bold">标准问题卡输出终端</span>
+                                <span class="font-pixel text-lg pixel-green" id="card-preview-code">MLJB 001</span>
+                            </div>
+                            <button onclick="copyCardText()" class="px-3 py-1.5 rounded-xl bg-[#FFEB14] text-zinc-950 text-xs font-extrabold border-b-2 border-yellow-600 active:translate-y-0.5 transition">
+                                <i class="fa-regular fa-copy mr-1"></i>
+                                <span id="copy-btn-text">复制问题卡</span>
+                            </button>
+                        </div>
+
+                        <div class="space-y-3 text-xs sm:text-sm" id="card-preview-body">
+                            <!-- Rendered via JS -->
+                        </div>
+
+                        <div class="p-3 rounded-xl bg-stone-900/90 border border-stone-800 text-[11px] text-stone-400 flex flex-wrap items-center justify-between gap-2">
+                            <span>SLA承诺：2个工作日确认收到，7个工作日反馈安排</span>
+                            <span class="pixel-green font-pixel text-sm">CANDIDATE_PRODUCT: NULL (待共议)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: BIDDING EVALUATION CALCULATOR (P18 / P31) -->
+            <div id="tool-tab-eval" class="hidden grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                <div class="lg:col-span-7 hardware-chassis p-6 sm:p-8 space-y-4">
+                    <div>
+                        <h3 class="font-black text-zinc-900 text-lg">候选解题团队简案评分器 (满分100分 · P18/P31)</h3>
+                        <p class="text-xs font-semibold text-stone-600">初选简案控制在2页以内，不要求报名专门开发或提交完整源代码；观众人气票不决定实施方。</p>
+                    </div>
+
+                    <div class="space-y-4 pt-2">
+                        <div class="p-3.5 rounded-xl bg-white border border-stone-300">
+                            <div class="flex justify-between text-xs font-extrabold mb-1.5">
+                                <span>1. 业务理解 (满分 30 分) — 理解实际任务、人工审核节点和例外</span>
+                                <span class="font-pixel text-lg px-2 rounded bg-zinc-900 text-[#FFEB14]" id="eval-val-1">25 / 30</span>
+                            </div>
+                            <input type="range" id="eval-s1" min="0" max="30" value="25" oninput="calcEval()" class="w-full cursor-pointer">
+                        </div>
+                        <div class="p-3.5 rounded-xl bg-white border border-stone-300">
+                            <div class="flex justify-between text-xs font-extrabold mb-1.5">
+                                <span>2. 技术可行性 (满分 25 分) — 数据、系统接入、失败处理及测试可信</span>
+                                <span class="font-pixel text-lg px-2 rounded bg-zinc-900 text-sky-400" id="eval-val-2">20 / 25</span>
+                            </div>
+                            <input type="range" id="eval-s2" min="0" max="25" value="20" oninput="calcEval()" class="w-full cursor-pointer">
+                        </div>
+                        <div class="p-3.5 rounded-xl bg-white border border-stone-300">
+                            <div class="flex justify-between text-xs font-extrabold mb-1.5">
+                                <span>3. 交付能力 (满分 20 分) — 实际人员、已有实现验证、交接及替代安排</span>
+                                <span class="font-pixel text-lg px-2 rounded bg-zinc-900 text-emerald-400" id="eval-val-3">16 / 20</span>
+                            </div>
+                            <input type="range" id="eval-s3" min="0" max="20" value="16" oninput="calcEval()" class="w-full cursor-pointer">
+                        </div>
+                        <div class="p-3.5 rounded-xl bg-white border border-stone-300">
+                            <div class="flex justify-between text-xs font-extrabold mb-1.5">
+                                <span>4. 总成本及维护边界 (满分 15 分) — 调用/部署/维护透明，范围有边界</span>
+                                <span class="font-pixel text-lg px-2 rounded bg-zinc-900 text-amber-400" id="eval-val-4">12 / 15</span>
+                            </div>
+                            <input type="range" id="eval-s4" min="0" max="15" value="12" oninput="calcEval()" class="w-full cursor-pointer">
+                        </div>
+                        <div class="p-3.5 rounded-xl bg-white border border-stone-300">
+                            <div class="flex justify-between text-xs font-extrabold mb-1.5">
+                                <span>5. 协作与投入 (满分 10 分) — 统一答疑、反馈配合及真实可投入时间明确</span>
+                                <span class="font-pixel text-lg px-2 rounded bg-zinc-900 text-pink-300" id="eval-val-5">9 / 10</span>
+                            </div>
+                            <input type="range" id="eval-s5" min="0" max="10" value="9" oninput="calcEval()" class="w-full cursor-pointer">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-5 hardware-chassis p-6">
+                    <div class="oled-screen p-6 space-y-5 text-center">
+                        <div class="text-xs font-pixel text-stone-400 uppercase tracking-widest">EVALUATION_SCORE_OUTPUT</div>
+                        <div class="text-7xl font-pixel pixel-green my-2" id="eval-total-score">82</div>
+                        <div class="text-xs font-bold px-3.5 py-1.5 rounded-full inline-block bg-emerald-500/20 text-emerald-300 border border-emerald-500/40" id="eval-verdict">
+                            推荐进入定向揭榜洽谈 (候选实施团队)
+                        </div>
+                        <div class="text-left text-xs text-stone-300 space-y-2 pt-4 border-t border-stone-800 leading-relaxed">
+                            <p><strong>● 利益冲突回避规则：</strong>评审专家如与候选团队存在投资、雇佣或商业关系，须事先披露并在正式项目评价时回避。</p>
+                            <p><strong>● 知识产权保护：</strong>每题原则上邀请2-3支适配团队提交2页简案，不同团队核心方案不互相分发；未入选方案不作为免费实施资料转交。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 3: 90-DAY LAUNCH & 6 APPROVAL DECISIONS (P27-P28) -->
+            <div id="tool-tab-roadmap" class="hidden grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                <!-- 90 Day Timeline -->
+                <div class="lg:col-span-7 hardware-chassis p-6 sm:p-8 space-y-4">
+                    <div class="flex flex-wrap items-center justify-between gap-2 border-b-2 border-stone-300 pb-3">
+                        <h3 class="font-black text-zinc-900 text-base sm:text-lg">首个 90 天启动排期 (含 FDE 补充动作 · P27/P35)</h3>
+                        <span class="text-xs font-extrabold px-2.5 py-1 rounded-lg bg-[#FFEB14] text-zinc-950">预算：¥16,000现金 + 24人日 (¥19,200)</span>
+                    </div>
+                    <div class="space-y-2.5 text-xs" id="ninety-day-list">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- 6 Decisions Interactive Sign-off -->
+                <div class="lg:col-span-5 red-selection-frame white-device-card p-6 sm:p-8 space-y-4">
+                    <div class="red-corner rc-tl"></div>
+                    <div class="red-corner rc-tr"></div>
+                    <div class="red-corner rc-bl"></div>
+                    <div class="red-corner rc-br"></div>
+
+                    <div class="flex items-center justify-between">
+                        <h3 class="font-black text-zinc-950 text-base sm:text-lg">立项需确认的 6 个决定 (P28)</h3>
+                        <span class="font-pixel text-base px-2.5 py-0.5 rounded bg-zinc-900 text-[#22C55E]" id="decision-progress">6 / 6 CONFIRMED</span>
+                    </div>
+                    <p class="text-xs font-semibold text-zinc-500">点击核查立项前提条件：</p>
+                    <div class="space-y-2.5 text-xs font-bold" id="decision-checklist">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16">
+        <div class="hardware-chassis p-6 sm:p-8 grid grid-cols-1 md:grid-cols-3 gap-6 text-xs text-stone-700">
+            <div class="space-y-1.5">
+                <div class="font-black text-zinc-900 text-sm">AGICamp 模力工场 · 模力揭榜计划 V2.1</div>
+                <p>企业出题 · 智囊共议 · FDE与OPC协作落地。完整映射《模力揭榜计划_全案策划方案 (2).docx》全部36页机制、表格与测算口径。</p>
+            </div>
+            <div class="space-y-1">
+                <div class="font-extrabold text-zinc-900">来源说明与机制参考 (P36)</div>
+                <p>[1] 极客邦科技，《企业有需求 FDE团队有能力 为什么AI项目仍难落地》，InfoQ，2026年10月22日。</p>
+                <p>[2] InnoCentive，Frequently Asked Questions（合作挑战与成果规则参考）。</p>
+                <p>[3] Palantir，Forward Deployed Software Engineer（FDE机制参考，2026年10月24日）。</p>
+            </div>
+            <div class="space-y-1">
+                <div class="font-extrabold text-zinc-900">合规与口径声明</div>
+                <p>财务示例统一按不含税口径；文中所列企业问题均为征题方向与策划示例，非已确认客户名单或订单。正式发布前需确认签约服务主体、可调用资源与售后安排。</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- INTERACTIVE HARDWARE LOGIC & WEB AUDIO SYNTH -->
+    <script>
+        // --- Web Audio API Mechanical Keyswitch Click Synthesizer ---
+        let soundEnabled = true;
+        let audioCtx = null;
+
+        function playClick(pitch = 800) {
+            if (!soundEnabled) return;
+            try {
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(pitch, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(140, audioCtx.currentTime + 0.045);
+
+                gain.gain.setValueAtTime(0.18, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.045);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.05);
+            } catch (e) {}
+        }
+
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            document.getElementById('sound-label').textContent = soundEnabled ? 'SFX:ON' : 'SFX:OFF';
+            document.getElementById('sound-icon').className = soundEnabled ? 'fa-solid fa-volume-high' : 'fa-solid fa-volume-xmark text-stone-500';
+            if (soundEnabled) playClick(1000);
+        }
+
+        // --- 1. Reference 1: 3x3 Sculpted Macro-Pad Keys Data (Punchy & Concise) ---
+        const macroKeys = [
+            {
+                code: "P1",
+                style: "key-white",
+                topTag: "KEY_1",
+                centerHtml: `<div class="my-auto flex flex-col items-center"><span class="text-2xl">🇺🇸</span><span class="text-[11px] font-black tracking-tight mt-1">带着问题来</span></div>`,
+                bottomLabel: "不逼当场签约",
+                oledTitle: "CLAIM // 带着真问题来，把下一步想清楚",
+                oledDesc: "可匿名、可辩论、可回去自己试。现场不要求做采购决定，也不预设所有问题必须开发 Agent。",
+                oledMetric: "BRAND: 模力揭榜计划统一主品牌"
+            },
+            {
+                code: "P2",
+                style: "key-pink",
+                topTag: "KEY_2",
+                centerHtml: `<div class="my-auto text-center"><span class="text-4xl sm:text-5xl font-normal tracking-tighter">100</span><div class="text-[11px] font-bold">首年真问题</div></div>`,
+                bottomLabel: "20min轻访谈",
+                oledTitle: "TARGET // 首年持续征集100个企业真问题",
+                oledDesc: "首阶段只收“最近一次卡住的经历”，不问预算。20分钟轻访谈生成匿名《问题卡》。",
+                oledMetric: "SLA: 2工作日确认 / 7工作日反馈"
+            },
+            {
+                code: "P3",
+                style: "key-lilac",
+                topTag: "KEY_3",
+                centerHtml: `<div class="my-auto text-center"><span class="text-3xl sm:text-4xl font-normal">8+2+2</span><div class="text-[11px] font-bold">全年12节点</div></div>`,
+                bottomLabel: "前半程禁推销",
+                oledTitle: "RHYTHM // 8月度 + 2季度 + 2半年度共创节",
+                oledDesc: "前半程只追问业务事实，严禁推销产品；允许主持人给出“暂时不用AI”的实诚结论。",
+                oledMetric: "BUDGET: ¥124k现金 + 122内部人日"
+            },
+            {
+                code: "P4",
+                style: "key-blue",
+                topTag: "KEY_4",
+                centerHtml: `<div class="my-auto text-center"><span class="text-3xl">😃</span><div class="text-[11px] font-extrabold mt-1">FDE驻场工程</div></div>`,
+                bottomLabel: "Palantir模式",
+                oledTitle: "FDE // 深入业务现场的前线部署工程师",
+                oledDesc: "不做甩手顾问！FDE驻场摸清流程、构建关键链路、联调OPC组件，每周演示可运行结果。",
+                oledMetric: "LIMIT: 1名主责FDE同期仅1个试点"
+            },
+            {
+                code: "P5",
+                style: "key-yellow",
+                topTag: "KEY_5",
+                centerHtml: `<div class="my-auto text-center"><span class="text-3xl">🐞</span><div class="text-[11px] font-extrabold mt-1">OPC真机核验</div></div>`,
+                bottomLabel: "2页简案揭榜",
+                oledTitle: "AI OPC // 敏捷解题人与真机Demo核验",
+                oledDesc: "初选仅需2页简案，不白嫖源码。技术负责人现场核验其真实数据来源、异常兜底与维护能力。",
+                oledMetric: "SCORE: 业务30+技术25+交付20+成本15+协作10"
+            },
+            {
+                code: "P6",
+                style: "key-white",
+                topTag: "KEY_6",
+                centerHtml: `<div class="my-auto flex flex-col items-center"><span class="w-7 h-7 rounded-full bg-red-600 inline-block shadow-inner"></span><span class="text-[11px] font-extrabold text-red-600 mt-1.5">MLJB 001</span></div>`,
+                bottomLabel: "出海首期标杆",
+                oledTitle: "PILOT 001 // 出海电商多语言本地化验证",
+                oledDesc: "1个品类×2个市场×60条样本×3周：验证合格稿人工时间减少30%，价格规格准确率≥98%。",
+                oledMetric: "BOUNDARY: 不含自动发布与ERP复杂集成"
+            },
+            {
+                code: "P7",
+                style: "key-green",
+                topTag: "KEY_7",
+                centerHtml: `<div class="my-auto text-center"><span class="text-2xl sm:text-3xl font-extrabold">12~18</span><div class="text-[11px] font-bold">付费试点目标</div></div>`,
+                bottomLabel: "¥15k / 50k / 80k",
+                oledTitle: "REVENUE // 三档阶梯定价与分阶段回款",
+                oledDesc: "FDE入企诊断 ¥1.5万(贡献¥5k)；轻量试点 ¥5万(贡献¥1.2万)；FDE牵头试点 ¥8万(贡献¥2.4万)。",
+                oledMetric: "PAY: 50%启动 / 30%中期 / 20%验收"
+            },
+            {
+                code: "P8",
+                style: "key-peach",
+                topTag: "KEY_8",
+                centerHtml: `<div class="my-auto text-center"><span class="text-4xl sm:text-5xl font-normal">90</span><div class="text-[11px] font-bold">天首轮冲刺</div></div>`,
+                bottomLabel: "¥1.6万+24人日",
+                oledTitle: "SPRINT // 首90天小步快跑闭环验证",
+                oledDesc: "先办2场月度+1场季度，征集20~30条真问题，拿下1~2个付费试点。第13周复盘后再扩量。",
+                oledMetric: "COST: ¥16,000现金 + 24人日(¥19,200)"
+            },
+            {
+                code: "P9",
+                style: "key-coral",
+                topTag: "KEY_9",
+                centerHtml: `<div class="my-auto text-center"><span class="text-4xl sm:text-5xl font-normal">6</span><div class="text-[11px] font-bold">立项拍板决定</div></div>`,
+                bottomLabel: "19单盈亏平衡",
+                oledTitle: "DECISION // 立项必拍板的6项铁律",
+                oledDesc: "统一主品牌、7岗不缺位、首90天预算、集团引荐边界、履约签约主体、W13复盘机制。",
+                oledMetric: "BREAKEVEN: 约19个轻量试点覆盖全年公共成本"
+            }
+        ];
+
+        let selectedMacroIndex = 0;
+
+        function renderHeroKeypad() {
+            const container = document.getElementById('hero-keypad');
+            container.innerHTML = macroKeys.map((k, idx) => `
+                <div onclick="pressMacroKey(${idx})" id="macro-key-${idx}" class="keycap ${k.style} min-h-[110px] sm:min-h-[122px] ${idx === selectedMacroIndex ? 'keycap-selected' : ''}">
+                    <div class="flex items-center justify-between text-[10px] font-bold opacity-75 z-10">
+                        <span>${k.topTag}</span>
+                        <span class="font-pixel text-xs">${k.code}</span>
+                    </div>
+                    <div class="z-10 my-1">${k.centerHtml}</div>
+                    <div class="text-[10px] font-extrabold tracking-wider text-center uppercase opacity-80 z-10">${k.bottomLabel}</div>
+                </div>
+            `).join('');
+        }
+
+        function pressMacroKey(idx) {
+            playClick(700 + idx * 45);
+            selectedMacroIndex = idx;
+            renderHeroKeypad();
+            const btnEl = document.getElementById(`macro-key-${idx}`);
+            if (btnEl) {
+                btnEl.classList.add('active-pressed');
+                setTimeout(() => btnEl.classList.remove('active-pressed'), 140);
+            }
+            const k = macroKeys[idx];
+            document.getElementById('oled-title').textContent = k.oledTitle;
+            document.getElementById('oled-desc').textContent = k.oledDesc;
+            document.getElementById('oled-code').textContent = `KEY: ${k.code}`;
+            document.getElementById('oled-metric').textContent = k.oledMetric;
+            document.getElementById('oled-counter').textContent = `0${idx + 1}/09`;
+        }
+
+        function randomMacroPress() {
+            const nextIdx = (selectedMacroIndex + 1 + Math.floor(Math.random() * 8)) % macroKeys.length;
+            pressMacroKey(nextIdx);
+        }
+
+        // Physical Keyboard [1-9] Shortcut Listener
+        window.addEventListener('keydown', (e) => {
+            if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName)) return;
+            const num = parseInt(e.key);
+            if (num >= 1 && num <= 9) {
+                pressMacroKey(num - 1);
+            }
+        });
+
+        // --- Rotary Knob Role Switcher ---
+        const rolesList = [
+            { id: 'all', name: '全景视角', mode: 'MODE: ALL_VIEW', deg: 0 },
+            { id: 'exec', name: '决策层视角', mode: 'MODE: EXEC_ROI', deg: 90 },
+            { id: 'ops', name: '活动运营视角', mode: 'MODE: EVENT_OPS', deg: 180 },
+            { id: 'delivery', name: 'FDE交付视角', mode: 'MODE: FDE_BUILD', deg: 270 }
+        ];
+        let currentRoleIdx = 0;
+
+        function rotateRoleKnob() {
+            playClick(520);
+            currentRoleIdx = (currentRoleIdx + 1) % rolesList.length;
+            const roleObj = rolesList[currentRoleIdx];
+            document.getElementById('macro-knob').style.transform = `rotate(${roleObj.deg}deg)`;
+            document.getElementById('knob-label').textContent = `旋钮:${roleObj.name}`;
+            document.getElementById('oled-role-indicator').textContent = roleObj.mode;
+
+            document.querySelectorAll('.role-section').forEach(sec => {
+                sec.classList.remove('role-highlight');
+                if (roleObj.id !== 'all' && sec.dataset.roles.includes(roleObj.id)) {
+                    sec.classList.add('role-highlight');
+                }
+            });
+        }
+
+        // --- 2. Reference 2: Sky-Blue Diorama Pill Windows (5-Stage Demand Funnel) ---
+        const funnelStages = [
+            {
+                stage: "S1",
+                name: "企业困惑 · 20min轻访谈",
+                badge: "0开发",
+                figures: ["🧑‍💼", "💬", "📝"],
+                cond: "准入：能讲清一次卡住的经历，不问预算。",
+                next: "动作：2工作日确认，输出匿名《问题卡》。"
+            },
+            {
+                stage: "S2",
+                name: "可共创问题 · 专场实证共议",
+                badge: "0开发",
+                figures: ["👩‍💻", "🧠", "⚡", "📊"],
+                cond: "准入：确认问题卡摘要，带脱敏源材料参会。",
+                next: "动作：多视角质询，2工作日内发一页《建议单》。"
+            },
+            {
+                stage: "S3",
+                name: "可验证需求 · FDE诊断与揭榜",
+                badge: "¥1.5万诊断",
+                figures: ["🕵️‍♂️", "🔍", "📐", "🤝"],
+                cond: "准入：目标、样本与企业业务搭档明确。",
+                next: "动作：FDE 5人日入企诊断，2~3支团队2页简案揭榜。"
+            },
+            {
+                stage: "S4",
+                name: "可实施项目 · 付费场景试点",
+                badge: "¥5万/8万",
+                figures: ["👷‍♂️", "⚙️", "🚀", "✅"],
+                cond: "准入：范围、预算、权限与验收人全部到位。",
+                next: "动作：签试点合同(50/30/20)，2~4周实测并培训交接。"
+            },
+            {
+                stage: "S5",
+                name: "扩展与维护 · 跨部门复购",
+                badge: "新范围重报",
+                figures: ["🏢", "🔄", "📈", "🛡️"],
+                cond: "准入：试点验收通过，需扩充语种/系统/部门。",
+                next: "动作：重核部署、调用与维护人日边界，签年度协议。"
+            }
+        ];
+
+        let activeDioramaIdx = 0;
+
+        function renderDioramaPills() {
+            const container = document.getElementById('diorama-pills-container');
+            container.innerHTML = funnelStages.map((s, idx) => `
+                <div onclick="selectDioramaStage(${idx})" class="diorama-pill px-4 py-2.5 cursor-pointer flex items-center justify-between ${idx === activeDioramaIdx ? 'active-pill' : ''}">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <span class="font-pixel text-xs font-bold px-1.5 rounded bg-zinc-900 text-white">${s.stage}</span>
+                            <span class="text-[10px] font-extrabold text-blue-950 bg-white/85 px-2 py-0.5 rounded-full">${s.badge}</span>
+                        </div>
+                        <div class="text-xs sm:text-sm font-black text-zinc-900 mt-0.5">${s.name}</div>
+                    </div>
+                    <div class="flex items-end space-x-1 bg-white/90 px-2.5 py-1 rounded-full shadow-sm border border-white">
+                        ${s.figures.map(f => `<span class="text-base sm:text-lg leading-none inline-block ${idx === activeDioramaIdx ? 'walker-hop' : ''}">${f}</span>`).join('')}
+                        ${idx === activeDioramaIdx ? '<span class="text-base sm:text-lg leading-none walker-hop">🚩</span>' : ''}
+                    </div>
+                </div>
+            `).join('');
+
+            const active = funnelStages[activeDioramaIdx];
+            document.getElementById('diorama-stage-detail').innerHTML = `
+                <div class="flex items-center justify-between font-extrabold text-zinc-900">
+                    <span>${active.stage} · ${active.name}</span>
+                    <span class="text-red-600 font-pixel text-sm">[STAGE_${activeDioramaIdx + 1}/5]</span>
+                </div>
+                <p class="text-stone-700">${active.cond}</p>
+                <p class="text-blue-800 font-bold">${active.next}</p>
+            `;
+        }
+
+        function selectDioramaStage(idx) {
+            playClick(660 + idx * 55);
+            activeDioramaIdx = idx;
+            renderDioramaPills();
+        }
+
+        function advanceDioramaStep() {
+            selectDioramaStage((activeDioramaIdx + 1) % funnelStages.length);
+        }
+
+        // --- 3. Section 02: 8 Target Industries Interactive Flip Keycaps ---
+        const industriesData = [
+            {
+                code: "IND_01",
+                ind: "出海电商",
+                priority: true,
+                style: "key-yellow",
+                theme: "“一个商品，怎么讲给不同市场听”",
+                problem: "多市场翻译反复，合规审核返工慢",
+                evidence: "1份脱敏源商品表 + 2份改五轮的渠道文案",
+                cap: "本地化工作流 / 客服辅助",
+                roles: "内容运营、跨境客服负责人"
+            },
+            {
+                code: "IND_02",
+                ind: "专业服务",
+                priority: true,
+                style: "key-blue",
+                theme: "“资料堆成山，交付还要熬夜”",
+                problem: "资料分散难寻出处，写报告靠熬夜",
+                evidence: "1次真实资料检索过程 + 文档交付经历",
+                cap: "企业知识库 / 文档工作流",
+                roles: "项目、知识管理负责人"
+            },
+            {
+                code: "IND_03",
+                ind: "制造业",
+                priority: false,
+                style: "key-white",
+                theme: "“老师傅的经验，能不能留下来”",
+                problem: "故障排查靠个人，老师傅经验难查",
+                evidence: "1个真实设备故障案例 + 现有排查记录",
+                cap: "作业知识库 / 维修辅助",
+                roles: "生产、设备、培训负责人"
+            },
+            {
+                code: "IND_04",
+                ind: "零售快消",
+                priority: false,
+                style: "key-pink",
+                theme: "“门店很忙，生意为什么没跟上”",
+                problem: "报表一堆，找不到滞销与流失真因",
+                evidence: "1份脱敏门店报表 + 1次经营判断复盘",
+                cap: "经营分析 / 会员运营辅助",
+                roles: "门店运营、商品、会员负责人"
+            },
+            {
+                code: "IND_05",
+                ind: "教育培训",
+                priority: false,
+                style: "key-lilac",
+                theme: "“课后问题很多，老师时间不够”",
+                problem: "重复答疑耗精力，教材更新跟不上",
+                evidence: "重复问题分类表 + 课程资料更新记录",
+                cap: "课程知识库 / 备课辅助",
+                roles: "教研、教学服务负责人"
+            },
+            {
+                code: "IND_06",
+                ind: "软件互联网",
+                priority: false,
+                style: "key-green",
+                theme: "“代码写快了，项目为何还在等”",
+                problem: "编码提速，但需求测试发布仍在等",
+                evidence: "1次从需求到上线的等待与返工记录",
+                cap: "研发协作 / 测试工作流",
+                roles: "研发、测试、产品负责人"
+            },
+            {
+                code: "IND_07",
+                ind: "物流供应链",
+                priority: false,
+                style: "key-peach",
+                theme: "“单据录入与异常协作拆解”",
+                problem: "单据反复录，异常状态跨团队追问",
+                evidence: "脱敏单据样本 + 跨团队异常查询记录",
+                cap: "单据提取 / 异常查询辅助",
+                roles: "运营、调度、信息化负责人"
+            },
+            {
+                code: "IND_08",
+                ind: "本地生活",
+                priority: false,
+                style: "key-coral",
+                theme: "“售后服务与知识持续更新”",
+                problem: "咨询散乱，预约与售后记录脱节",
+                evidence: "客服转交记录 + 门店预约跟进表",
+                cap: "服务知识库 / 预约辅助",
+                roles: "客服、门店、运营负责人"
+            }
+        ];
+
+        const flippedIndustries = new Set();
+        let currentIndMode = 'all';
+
+        function filterIndustry(mode) {
+            playClick(750);
+            currentIndMode = mode;
+            renderIndustries();
+        }
+
+        function toggleIndFlip(code) {
+            playClick(840);
+            if (flippedIndustries.has(code)) {
+                flippedIndustries.delete(code);
+            } else {
+                flippedIndustries.add(code);
+            }
+            renderIndustries();
+        }
+
+        function renderIndustries() {
+            const list = currentIndMode === 'priority' ? industriesData.filter(d => d.priority) : industriesData;
+            const grid = document.getElementById('industry-grid');
+            grid.innerHTML = list.map(item => {
+                const isFlipped = flippedIndustries.has(item.code);
+                if (!isFlipped) {
+                    return `
+                        <div onclick="toggleIndFlip('${item.code}')" class="keycap ${item.style} min-h-[168px] justify-between">
+                            <div class="space-y-1.5 z-10">
+                                <div class="flex items-center justify-between">
+                                    <span class="font-pixel text-sm opacity-75">${item.code}</span>
+                                    ${item.priority ? '<span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-zinc-900 text-[#FFEB14]">★ 首期优先</span>' : '<span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-black/10">储备方向</span>'}
+                                </div>
+                                <div class="font-black text-lg">${item.ind}</div>
+                                <div class="text-xs font-extrabold opacity-95">${item.theme}</div>
+                                <p class="text-xs opacity-85">痛点：${item.problem}</p>
+                            </div>
+                            <div class="pt-2 border-t border-black/10 flex items-center justify-between text-[11px] font-extrabold z-10">
+                                <span>候选：${item.cap}</span>
+                                <span class="underline">点看证据 ↻</span>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    return `
+                        <div onclick="toggleIndFlip('${item.code}')" class="keycap key-white min-h-[168px] justify-between keycap-selected">
+                            <div class="space-y-1.5 z-10">
+                                <div class="flex items-center justify-between">
+                                    <span class="font-pixel text-xs px-1.5 rounded bg-red-600 text-white">EVIDENCE // 会前证据</span>
+                                    <span class="text-xs font-black text-zinc-900">${item.ind}</span>
+                                </div>
+                                <div class="p-2.5 rounded-xl bg-stone-900 text-emerald-300 text-xs font-bold leading-relaxed mt-1">
+                                    📋 ${item.evidence}
+                                </div>
+                                <div class="text-xs text-zinc-700 pt-1">
+                                    <strong>邀约角色：</strong>${item.roles}
+                                </div>
+                            </div>
+                            <div class="pt-1.5 border-t border-stone-300 flex items-center justify-between text-[11px] font-extrabold text-blue-700 z-10">
+                                <span>先看事实，不预设Agent</span>
+                                <span>返回正面 ↺</span>
+                            </div>
+                        </div>
+                    `;
+                }
+            }).join('');
+        }
+
+        // --- 4. Section 03: 12-Month Sequencer & Agendas ---
+        const calendarData = [
+            { m: "M01", type: "月度", style: "key-white", theme: "出海电商内容本地化", out: "源资料、文案审核与返工困惑" },
+            { m: "M02", type: "月度", style: "key-white", theme: "企业资料检索与交付", out: "资料难找、出处不清、版本混乱" },
+            { m: "M03", type: "季度", style: "key-blue", theme: "内容和知识接入日常", out: "比较两类场景，形成验证任务" },
+            { m: "M04", type: "月度", style: "key-white", theme: "制造经验与故障排查", out: "经验传承、作业查询真实案例" },
+            { m: "M05", type: "月度", style: "key-white", theme: "零售经营与会员运营", out: "数据很多但行动不明确的问题" },
+            { m: "M06", type: "共创节", style: "key-yellow", theme: "那些还没被AI解决的事", out: "回访首批探索与试点，开放新题" },
+            { m: "M07", type: "月度", style: "key-white", theme: "教育培训与课程答疑", out: "重复问题、资料维护与教师投入" },
+            { m: "M08", type: "月度", style: "key-white", theme: "研发协作与测试发布", out: "编码之外的等待与返工" },
+            { m: "M09", type: "季度", style: "key-blue", theme: "AI项目为何停在Demo", out: "聚合数据、组织、接入及维护" },
+            { m: "M10", type: "月度", style: "key-white", theme: "物流单据与异常协作", out: "录入与查状态的流程问题" },
+            { m: "M11", type: "月度", style: "key-white", theme: "售后服务与知识更新", out: "问题转交、服务记录及持续更新" },
+            { m: "M12", type: "共创节", style: "key-yellow", theme: "企业真问题的年度回访", out: "展示有证据的变化，讨论下一年" }
+        ];
+
+        let activeMonthIdx = 0;
+
+        function selectMonth(idx) {
+            playClick(860);
+            activeMonthIdx = idx;
+            const c = calendarData[idx];
+            document.getElementById('cal-oled-month').textContent = `${c.m} // ${c.type}专场`;
+            document.getElementById('cal-oled-theme').textContent = c.theme;
+            document.getElementById('cal-oled-out').textContent = `核心产出：${c.out}`;
+            renderCalendar();
+        }
+
+        function renderCalendar() {
+            const grid = document.getElementById('calendar-grid');
+            grid.innerHTML = calendarData.map((c, idx) => `
+                <div onclick="selectMonth(${idx})" class="keycap ${c.style} min-h-[96px] ${idx === activeMonthIdx ? 'keycap-selected' : ''}">
+                    <div class="z-10">
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="font-pixel text-base font-bold">${c.m}</span>
+                            <span class="text-[10px] px-1.5 py-0.5 rounded-full font-extrabold bg-black/15">${c.type}</span>
+                        </div>
+                        <div class="text-xs font-black leading-snug">${c.theme}</div>
+                    </div>
+                    <p class="text-[10px] opacity-80 mt-1.5 truncate z-10">${c.out}</p>
+                </div>
+            `).join('');
+        }
+
+        const agendas = {
+            monthly: {
+                title: "月度主题专场 · 120分钟沙盘推演 (P10)",
+                subtitle: "20人黄金席位：发题企3 + 同行5 + OPC6 + 智囊3 + 主持记录3",
+                steps: [
+                    { time: "10m", name: "01. 规则亮牌", desc: "说明公开范围，披露各自身份与商业关系" },
+                    { time: "15m", name: "02. 痛点还原", desc: "企业演示脱敏材料，讲清最近一次卡住经历" },
+                    { time: "20m", name: "03. 事实追问", desc: "FDE与智囊追问频次、例外与审核，前半程禁推销" },
+                    { time: "30m", name: "04. 多维共议", desc: "业务、技术与OPC交锋，比较改流程与上工具" },
+                    { time: "20m", name: "05. 样例实测", desc: "用脱敏样例对照检验判断（提问用，非验收）" },
+                    { time: "15m", name: "06. 共识分歧", desc: "记录有效建议、保留分歧及待验证假设" },
+                    { time: "10m", name: "07. 自由下一步", desc: "企业自愿选择：自己试 / 继续聊 / 找团队" }
+                ],
+                rules: [
+                    "允许得出“暂时不用AI，先改表格流程”的结论。",
+                    "OPC展示既有作品，不要求为报名专门开发。",
+                    "会后2工作日发一页《建议单》，7工作日自愿回访。",
+                    "单场预算：¥3,000现金 + 6内部人日。"
+                ]
+            },
+            quarterly: {
+                title: "季度共创专场 · 180分钟分组验证 (P11)",
+                subtitle: "30-50人规模，围绕2-3个已澄清同类需求分组设计验证任务",
+                steps: [
+                    { time: "15m", name: "01. 老题回访", desc: "上轮企业说明回去尝试后的真实变化" },
+                    { time: "25m", name: "02. 新题亮卡", desc: "2-3家企业按问题卡补充事实与约束" },
+                    { time: "50m", name: "03. 路径比选", desc: "分组填写《共创工作单》：现成工具vs流程vs开发" },
+                    { time: "30m", name: "04. 交叉质询", desc: "追问谁负责维护、错误由谁兜底、月度成本多少" },
+                    { time: "40m", name: "05. 任务设计", desc: "锁定样本量、测试法、业务搭档与观察周期" },
+                    { time: "20m", name: "06. 定向预约", desc: "区分标记“共创伙伴”与“候选实施团队”" }
+                ],
+                rules: [
+                    "主持人四连问：不开发能否解？谁更资料？谁审错？月护多少钱？",
+                    "升级门槛：至少2个持续参与的企业真问题+适配智囊。",
+                    "单场预算：¥10,000现金 + 12内部人日。"
+                ]
+            },
+            festival: {
+                title: "半年度共创节 · 全天100人展集与揭榜 (P12)",
+                subtitle: "设置企业问题墙、智囊圆桌、模力辩题与OPC解题集市体验桌",
+                steps: [
+                    { time: "09:30", name: "01. 问题墙贴标", desc: "参与者贴标：我们也遇到 / 愿意共议 / 愿意解题" },
+                    { time: "10:00", name: "02. 回访与新题", desc: "真实回访前期项目（含受阻点），分享3-4个新题" },
+                    { time: "11:10", name: "03. 智囊圆桌", desc: "企业、专家、OPC混坐拆解落地分歧" },
+                    { time: "13:30", name: "04. 辩题+OPC集市", desc: "交锋工具与交付边界；OPC真机演示能力与限制" },
+                    { time: "15:25", name: "05. FDE×OPC组队", desc: "专题分组输出路径比较与可验证任务书" },
+                    { time: "16:25", name: "06. 自愿揭榜对接", desc: "成熟项目受控洽谈，发布经授权共创建议" }
+                ],
+                rules: [
+                    "举办前提：积累≥6条展示问题 + ≥4个回访记录 + ≥6个OPC展示。",
+                    "条件不足时自动降级为主题共创日，绝不包装虚假成果。",
+                    "单场预算：¥40,000现金 + 25内部人日。"
+                ]
+            }
+        };
+
+        let currentAgendaType = 'monthly';
+        let activeAgendaStep = -1;
+        let agendaTimer = null;
+
+        function switchAgenda(type) {
+            playClick(700);
+            if (agendaTimer) {
+                clearInterval(agendaTimer);
+                agendaTimer = null;
+            }
+            currentAgendaType = type;
+            activeAgendaStep = -1;
+            ['monthly', 'quarterly', 'festival'].forEach(t => {
+                const btn = document.getElementById(`btn-agenda-${t}`);
+                btn.className = t === type
+                    ? "px-3 py-2 rounded-xl text-xs font-extrabold bg-[#1E78FF] text-white border-b-4 border-[#05358A] transition"
+                    : "px-3 py-2 rounded-xl text-xs font-extrabold bg-white text-zinc-800 border-b-4 border-stone-300 transition";
+            });
+            renderAgendaSteps();
+        }
+
+        function renderAgendaSteps() {
+            const data = agendas[currentAgendaType];
+            document.getElementById('agenda-title').textContent = data.title;
+            document.getElementById('agenda-subtitle').textContent = data.subtitle;
+            document.getElementById('agenda-steps').innerHTML = data.steps.map((s, idx) => `
+                <div onclick="highlightAgendaStep(${idx})" class="p-3 rounded-2xl cursor-pointer transition flex items-center justify-between gap-3 ${idx === activeAgendaStep ? 'bg-[#FFEB14] border-2 border-zinc-900 shadow-md scale-[1.01]' : 'bg-white border-2 border-stone-200 hover:border-blue-400'}">
+                    <div>
+                        <span class="text-xs sm:text-sm font-black text-zinc-900">${s.name}</span>
+                        <span class="text-xs text-stone-600 ml-2">${s.desc}</span>
+                    </div>
+                    <span class="px-2 py-0.5 rounded-lg bg-zinc-900 text-[#FFEB14] text-sm font-pixel shrink-0">${s.time}</span>
+                </div>
+            `).join('');
+            document.getElementById('agenda-rules').innerHTML = `
+                <div class="text-sm font-pixel pixel-green flex items-center justify-between border-b border-stone-800 pb-2">
+                    <span>SOP_DISCIPLINE // 纪律与预算</span>
+                    <span>VERIFIED</span>
+                </div>
+                <ul class="space-y-2 text-xs text-stone-300 list-disc pl-4 leading-relaxed">
+                    ${data.rules.map(r => `<li>${r}</li>`).join('')}
+                </ul>
+            `;
+        }
+
+        function highlightAgendaStep(idx) {
+            playClick(820);
+            activeAgendaStep = idx;
+            renderAgendaSteps();
+        }
+
+        function playAgendaSimulation() {
+            if (agendaTimer) {
+                clearInterval(agendaTimer);
+                agendaTimer = null;
+                document.getElementById('btn-agenda-play').innerHTML = `<i class="fa-solid fa-play"></i><span>自动推演环节</span>`;
+                return;
+            }
+            const stepsLen = agendas[currentAgendaType].steps.length;
+            activeAgendaStep = 0;
+            playClick(900);
+            renderAgendaSteps();
+            document.getElementById('btn-agenda-play').innerHTML = `<i class="fa-solid fa-stop"></i><span>停止推演</span>`;
+
+            agendaTimer = setInterval(() => {
+                activeAgendaStep++;
+                if (activeAgendaStep >= stepsLen) {
+                    clearInterval(agendaTimer);
+                    agendaTimer = null;
+                    activeAgendaStep = -1;
+                    document.getElementById('btn-agenda-play').innerHTML = `<i class="fa-solid fa-play"></i><span>自动推演环节</span>`;
+                    renderAgendaSteps();
+                } else {
+                    playClick(750 + activeAgendaStep * 40);
+                    renderAgendaSteps();
+                }
+            }, 900);
+        }
+
+        // --- 5. Section 04: FDE x OPC Role Matrix & 6-Step Pipeline ---
+        const roleMatrixData = [
+            {
+                role: "FDE 前线工程师",
+                badge: "现场工程核心",
+                style: "key-blue",
+                duty: "驻场摸流程、动手写关键链路、系统集成与结果实测。",
+                boundary: "绝非纯动嘴顾问；1名主责FDE同期仅1个试点。"
+            },
+            {
+                role: "AI OPC 解题人",
+                badge: "敏捷组件伙伴",
+                style: "key-green",
+                duty: "提供验证过的产品组件，或兼任轻量场景FDE交付。",
+                boundary: "OPC是创业形态，FDE是工程角色，按工作包结算。"
+            },
+            {
+                role: "行业与技术智囊",
+                badge: "12-20人专家网",
+                style: "key-white",
+                duty: "挑战伪需求假设，评估数据风险，帮企业判断值不值。",
+                boundary: "共议不等于包售后；有利益关系须披露并回避评分。"
+            },
+            {
+                role: "平台项目经理 PM",
+                badge: "排期与成本闸门",
+                style: "key-yellow",
+                duty: "管排期、管调用上限、管变更与回款节点。",
+                boundary: "不代替FDE做技术判断；1名PM最多并行2个小试点。"
+            },
+            {
+                role: "企业业务搭档",
+                badge: "客户方必配",
+                style: "key-coral",
+                duty: "提供脱敏样本、组织内部试用反馈并签认业务结果。",
+                boundary: "业务决策与人工审核责任在企业，外部团队不越俎代庖。"
+            }
+        ];
+
+        const fdePipelineData = [
+            { step: "01.共议初筛", act: "参加轻访谈判范围", out: "待核实清单", gate: "企业自愿继续" },
+            { step: "02.入企诊断", act: "跟岗看流程查样本", out: "基线与候选路径", gate: "可独立付费¥1.5万" },
+            { step: "03.试点设计", act: "拆分FDE×OPC工作包", out: "任务书与退出边界", gate: "确认范围与预算" },
+            { step: "04.实施迭代", act: "写关键链路+每周演示", out: "可运行原型版本", gate: "业务搭档与权限到位" },
+            { step: "05.验证交接", act: "60样本实测+培训", out: "测试报告+运行手册", gate: "业务与技术双签认" },
+            { step: "06.扩展维护", act: "评估跨部门新场景", out: "独立扩展报价单", gate: "重签费用与责任" }
+        ];
+
+        let activeFdeStep = 1;
+
+        function selectFdeStep(idx) {
+            playClick(800 + idx * 35);
+            activeFdeStep = idx;
+            renderFdeSection();
+        }
+
+        function renderFdeSection() {
+            document.getElementById('role-matrix').innerHTML = roleMatrixData.map(r => `
+                <div onclick="playClick(760)" class="keycap ${r.style} justify-between space-y-2">
+                    <div class="z-10">
+                        <span class="text-[10px] font-extrabold px-2 py-0.5 rounded bg-black/15">${r.badge}</span>
+                        <div class="font-black text-base mt-1.5">${r.role}</div>
+                        <p class="text-xs opacity-90 mt-1 leading-relaxed">${r.duty}</p>
+                    </div>
+                    <div class="pt-2 border-t border-black/15 text-[11px] opacity-85 z-10">
+                        <strong>红线：</strong>${r.boundary}
+                    </div>
+                </div>
+            `).join('');
+
+            document.getElementById('fde-pipeline').innerHTML = fdePipelineData.map((p, idx) => `
+                <div onclick="selectFdeStep(${idx})" class="p-3.5 rounded-2xl cursor-pointer transition flex flex-col justify-between space-y-2 ${idx === activeFdeStep ? 'bg-[#1E78FF] text-white shadow-lg scale-[1.02]' : 'bg-stone-100 border-2 border-stone-200 hover:border-blue-400 text-zinc-900'}">
+                    <div>
+                        <div class="font-pixel text-sm font-bold ${idx === activeFdeStep ? 'text-[#FFEB14]' : 'text-blue-700'}">${p.step}</div>
+                        <p class="text-xs font-black mt-1">${p.act}</p>
+                        <p class="text-[11px] ${idx === activeFdeStep ? 'text-blue-100' : 'text-stone-600'} mt-0.5">产出：${p.out}</p>
+                    </div>
+                    <div class="pt-1.5 border-t ${idx === activeFdeStep ? 'border-blue-400 text-[#FFEB14]' : 'border-stone-300 text-emerald-700'} text-[11px] font-bold">
+                        闸门：${p.gate}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // --- 6. Section 05: Financial Calculator ---
+        function updateFinancials() {
+            const lightCount = parseInt(document.getElementById('slider-light').value) || 0;
+            const diagCount = parseInt(document.getElementById('slider-diag').value) || 0;
+            const fdeCount = parseInt(document.getElementById('slider-fde').value) || 0;
+
+            const mCount = parseInt(document.getElementById('num-monthly').value) || 0;
+            const qCount = parseInt(document.getElementById('num-quarterly').value) || 0;
+            const fCount = parseInt(document.getElementById('num-festival').value) || 0;
+
+            document.getElementById('val-light-pilots').textContent = `${lightCount} 个`;
+            document.getElementById('val-fde-diag').textContent = `${diagCount} 个`;
+            document.getElementById('val-fde-pilots').textContent = `${fdeCount} 个`;
+
+            const totalRev = (lightCount * 50000) + (diagCount * 15000) + (fdeCount * 80000);
+            const totalContrib = (lightCount * 12000) + (diagCount * 5000) + (fdeCount * 24000);
+
+            const publicCash = (mCount * 3000) + (qCount * 10000) + (fCount * 40000);
+            const publicDays = (mCount * 6) + (qCount * 12) + (fCount * 25);
+            const publicLabor = publicDays * 800;
+            const totalPublicCost = publicCash + publicLabor;
+
+            const netBalance = totalContrib - totalPublicCost;
+
+            document.getElementById('out-total-rev').textContent = `¥${totalRev.toLocaleString()}`;
+            document.getElementById('out-project-contrib').textContent = `¥${totalContrib.toLocaleString()}`;
+            document.getElementById('out-public-cost').textContent = `¥${totalPublicCost.toLocaleString()}`;
+            document.getElementById('out-public-detail').textContent = `现金 ¥${publicCash.toLocaleString()} + ${publicDays}d(¥${publicLabor.toLocaleString()})`;
+
+            const balEl = document.getElementById('out-net-balance');
+            const badgeEl = document.getElementById('fin-status-badge');
+            if (netBalance >= 0) {
+                balEl.textContent = `+¥${netBalance.toLocaleString()}`;
+                balEl.className = "text-2xl font-pixel pixel-green";
+                badgeEl.textContent = "已覆盖公共成本 (正向贡献)";
+                badgeEl.className = "text-xs font-bold px-2.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40";
+            } else {
+                balEl.textContent = `-¥${Math.abs(netBalance).toLocaleString()}`;
+                balEl.className = "text-2xl font-pixel text-amber-400";
+                badgeEl.textContent = "业务培育期投入缺口";
+                badgeEl.className = "text-xs font-bold px-2.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40";
+            }
+        }
+
+        function applyPreset(preset) {
+            playClick(860);
+            if (preset === '90days') {
+                document.getElementById('slider-light').value = 2;
+                document.getElementById('slider-diag').value = 0;
+                document.getElementById('slider-fde').value = 0;
+                document.getElementById('num-monthly').value = 2;
+                document.getElementById('num-quarterly').value = 1;
+                document.getElementById('num-festival').value = 0;
+            } else if (preset === 'base18') {
+                document.getElementById('slider-light').value = 18;
+                document.getElementById('slider-diag').value = 0;
+                document.getElementById('slider-fde').value = 0;
+                document.getElementById('num-monthly').value = 8;
+                document.getElementById('num-quarterly').value = 2;
+                document.getElementById('num-festival').value = 2;
+            } else if (preset === 'fdeMix') {
+                document.getElementById('slider-light').value = 12;
+                document.getElementById('slider-diag').value = 6;
+                document.getElementById('slider-fde').value = 5;
+                document.getElementById('num-monthly').value = 8;
+                document.getElementById('num-quarterly').value = 2;
+                document.getElementById('num-festival').value = 2;
+            }
+            updateFinancials();
+        }
+
+        // --- 7. Section 06: Workbench Tools & Receipt Printer ---
+        function switchToolTab(tab) {
+            playClick(740);
+            ['card', 'eval', 'roadmap'].forEach(t => {
+                const panel = document.getElementById(`tool-tab-${t}`);
+                const btn = document.getElementById(`tab-btn-${t}`);
+                if (t === tab) {
+                    panel.classList.remove('hidden');
+                    panel.classList.add('grid');
+                    btn.className = "px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-black bg-[#1E78FF] text-white border-b-4 border-[#05358A] active:translate-y-0.5 transition";
+                } else {
+                    panel.classList.add('hidden');
+                    panel.classList.remove('grid');
+                    btn.className = "px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-black bg-white text-zinc-800 border-b-4 border-stone-300 active:translate-y-0.5 transition";
+                }
+            });
+        }
+
+        let sampleIndex = 0;
+        const sampleCards = [
+            {
+                code: "MLJB 002 | 华东某精密制造厂",
+                ind: "制造业 · 设备工程部",
+                story: "车间非标设备偶发报警，年轻技术员查几百页手册找不到原因，每次都得打电话问快退休的老师傅。",
+                question: "老师傅经验怎么低成本沉淀？先做交接记录规范，还是直接建作业知识库？",
+                mat: "1份真实故障维修单 + 2份报警手册节选"
+            },
+            {
+                code: "MLJB 003 | 某连锁零售总部",
+                ind: "零售快消 · 门店运营部",
+                story: "每周一导出十几张销售和会员表，店长开会仍靠猜为什么新品滞销、复购下滑。",
+                question: "现有报表质量能否支撑AI分析？如何把分析变成店长能执行的动作？",
+                mat: "1份脱敏门店周报 + 1次店长周会复盘记录"
+            },
+            {
+                code: "MLJB 001 | 某出海家居电商",
+                ind: "出海电商 · 内容运营部",
+                story: "商品资料需适配欧美日多市场，AI生成首稿快，但规格核对与本地化返工极耗人力。",
+                question: "问题出在源资料表还是翻译流程？先改源表还是上本地化工作流？",
+                mat: "1份源商品表 + 2份改五轮的返工稿"
+            }
+        ];
+
+        function fillSampleCard() {
+            playClick(920);
+            const s = sampleCards[sampleIndex % sampleCards.length];
+            sampleIndex++;
+            document.getElementById('inp-code').value = s.code;
+            document.getElementById('inp-ind').value = s.ind;
+            document.getElementById('inp-story').value = s.story;
+            document.getElementById('inp-question').value = s.question;
+            document.getElementById('inp-mat').value = s.mat;
+            renderQuestionCard(true);
+        }
+
+        function escapeHtml(value) {
+            return String(value).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+        }
+
+        function renderQuestionCard(animate = false) {
+            const code = document.getElementById('inp-code').value;
+            const ind = document.getElementById('inp-ind').value;
+            const story = document.getElementById('inp-story').value;
+            const question = document.getElementById('inp-question').value;
+            const mat = document.getElementById('inp-mat').value;
+            const pref = document.getElementById('inp-pref').value;
+
+            document.getElementById('card-preview-code').textContent = code.split('|')[0].trim();
+            const bodyEl = document.getElementById('card-preview-body');
+            if (animate) {
+                bodyEl.classList.remove('receipt-print-fx');
+                void bodyEl.offsetWidth;
+                bodyEl.classList.add('receipt-print-fx');
+            }
+            bodyEl.innerHTML = `
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 p-2.5 rounded-xl bg-stone-900/90 border border-stone-800">
+                    <div><span class="text-stone-400">代号：</span><strong class="text-white">${escapeHtml(code)}</strong></div>
+                    <div><span class="text-stone-400">场景：</span><strong class="text-sky-300">${escapeHtml(ind)}</strong></div>
+                </div>
+                <div class="p-2.5 rounded-xl bg-stone-900/90 border border-stone-800">
+                    <span class="text-stone-400">卡住经历：</span><span class="text-stone-200">${escapeHtml(story)}</span>
+                </div>
+                <div class="p-2.5 rounded-xl bg-stone-900/90 border border-emerald-500/40">
+                    <span class="text-emerald-400 font-bold">核心追问：</span><span class="text-white">${escapeHtml(question)}</span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 p-2.5 rounded-xl bg-stone-900/90 border border-stone-800">
+                    <div><span class="text-stone-400">脱敏证据：</span><span class="text-amber-300">${escapeHtml(mat)}</span></div>
+                    <div><span class="text-stone-400">后续偏好：</span><span class="text-sky-300">${escapeHtml(pref)}</span></div>
+                </div>
+            `;
+        }
+
+        function copyCardText() {
+            playClick(980);
+            renderQuestionCard(true);
+            const code = document.getElementById('inp-code').value;
+            const ind = document.getElementById('inp-ind').value;
+            const story = document.getElementById('inp-story').value;
+            const question = document.getElementById('inp-question').value;
+            const mat = document.getElementById('inp-mat').value;
+            const pref = document.getElementById('inp-pref').value;
+
+            const text = `【模力揭榜计划 · 标准问题卡】\n编号：${code}\n场景：${ind}\n经历：${story}\n追问：${question}\n证据：${mat}\n偏好：${pref}`;
+
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+
+            const btnText = document.getElementById('copy-btn-text');
+            btnText.textContent = "已出票并复制 ✓";
+            setTimeout(() => { btnText.textContent = "打印/复制问题卡"; }, 2000);
+        }
+
+        function calcEval() {
+            const s1 = parseInt(document.getElementById('eval-s1').value);
+            const s2 = parseInt(document.getElementById('eval-s2').value);
+            const s3 = parseInt(document.getElementById('eval-s3').value);
+            const s4 = parseInt(document.getElementById('eval-s4').value);
+            const s5 = parseInt(document.getElementById('eval-s5').value);
+
+            document.getElementById('eval-val-1').textContent = `${s1} / 30`;
+            document.getElementById('eval-val-2').textContent = `${s2} / 25`;
+            document.getElementById('eval-val-3').textContent = `${s3} / 20`;
+            document.getElementById('eval-val-4').textContent = `${s4} / 15`;
+            document.getElementById('eval-val-5').textContent = `${s5} / 10`;
+
+            const total = s1 + s2 + s3 + s4 + s5;
+            document.getElementById('eval-total-score').textContent = total;
+            const verdict = document.getElementById('eval-verdict');
+            if (total >= 80) {
+                verdict.textContent = "推荐进入定向揭榜洽谈 (候选实施团队)";
+                verdict.className = "text-xs font-bold px-3.5 py-1.5 rounded-full inline-block bg-emerald-500/20 text-emerald-300 border border-emerald-500/40";
+            } else if (total >= 65) {
+                verdict.textContent = "可由FDE牵头补齐工程短板后联合实施";
+                verdict.className = "text-xs font-bold px-3.5 py-1.5 rounded-full inline-block bg-sky-500/20 text-sky-300 border border-sky-500/40";
+            } else {
+                verdict.textContent = "暂不推荐承接交付，仅保持主题交流";
+                verdict.className = "text-xs font-bold px-3.5 py-1.5 rounded-full inline-block bg-rose-500/20 text-rose-300 border border-rose-500/40";
+            }
+        }
+
+        const ninetyDays = [
+            { w: "W1~W2", task: "定7岗责任，访谈首批企业；落实1名主责FDE+1备援，核验2~3个OPC真机Demo", out: "首批问题卡 + FDE成本口径" },
+            { w: "W3~W4", task: "举办首场月度专场（FDE现场追问流程事实，前半程禁推销）", out: "1页建议单 + 1个配业务搭档场景" },
+            { w: "W5~W6", task: "回访首题，FDE完成入企诊断与工作包拆解", out: "试点任务书或继续共创" },
+            { w: "W7~W8", task: "举办第二场月度专场，推进首个试点完整报价与签约", out: "首个付费试点合同" },
+            { w: "W9~W10", task: "启动付费试点（FDE每周演示可运行结果），筹备季度专场", out: "阶段原型 + 实际工时记录" },
+            { w: "W11~W12", task: "举办季度共创专场，完成首轮试点60样本测试交接", out: "测试报告 + 验收双签认" },
+            { w: "W13", task: "核查回款、返工与持续使用情况，拍板下阶段及共创节排期", out: "Q2资源正式排期" }
+        ];
+
+        const sixDecisions = [
+            "1. 统一主品牌“模力揭榜计划”，先跑90天验证（20-30真问题 / 1-2付费试点）。",
+            "2. 落实总负责、企业、FDE技术、PM、生态、活动、商务7岗（可兼岗不缺位）。",
+            "3. 批复首90天 ¥16,000 公共现金 + 24人日（¥19,200）启动预算。",
+            "4. 明确 InfoQ/极客时间/TGO 资源由原联系人引荐，不默认无偿共享名单。",
+            "5. 明确签约主体、OPC/FDE采购结算与回款节点（绝不承诺超能力垫资）。",
+            "6. 锁定第13周复盘闸门，验证回款与交付能力后再办半年度共创节。"
+        ];
+
+        function renderRoadmapTab() {
+            document.getElementById('ninety-day-list').innerHTML = ninetyDays.map(d => `
+                <div onclick="playClick(790)" class="p-2.5 rounded-xl bg-white border-2 border-stone-200 hover:border-blue-400 cursor-pointer transition flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div>
+                        <span class="font-pixel text-sm px-2 py-0.5 rounded bg-zinc-900 text-[#FFEB14] mr-2">${d.w}</span>
+                        <span class="text-zinc-900 font-bold">${d.task}</span>
+                    </div>
+                    <span class="text-[11px] font-extrabold px-2.5 py-0.5 rounded-lg bg-emerald-100 text-emerald-900 shrink-0">${d.out}</span>
+                </div>
+            `).join('');
+
+            document.getElementById('decision-checklist').innerHTML = sixDecisions.map((dec) => `
+                <label class="flex items-start space-x-2.5 p-2.5 rounded-xl bg-stone-100 border border-stone-200 cursor-pointer hover:border-red-400 transition">
+                    <input type="checkbox" checked onchange="updateDecisionCount()" class="dec-chk mt-0.5 w-4 h-4 rounded accent-red-600">
+                    <span class="text-zinc-800 leading-snug">${dec}</span>
+                </label>
+            `).join('');
+        }
+
+        function updateDecisionCount() {
+            playClick(840);
+            const chks = document.querySelectorAll('.dec-chk:checked').length;
+            document.getElementById('decision-progress').textContent = `${chks} / 6 CONFIRMED`;
+        }
+
+        function scrollToSection(id) {
+            playClick(640);
+            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+        }
+
+        window.onload = function() {
+            renderHeroKeypad();
+            renderDioramaPills();
+            renderIndustries();
+            renderCalendar();
+            switchAgenda('monthly');
+            renderFdeSection();
+            updateFinancials();
+            renderQuestionCard();
+            calcEval();
+            renderRoadmapTab();
+        };
+    </script>
+</body>
+</html>
