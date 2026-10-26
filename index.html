@@ -382,6 +382,78 @@
         }
         @keyframes recording-blink { 0%, 100% { opacity: 1; } 50% { opacity: .3; } }
         @media (prefers-reduced-motion: reduce) { .record-dot { animation: none; } }
+
+        /* Compact touch layout for phones; desktop retains the hardware layout. */
+        @media (max-width: 639px) {
+            html { scroll-padding-top: 126px; }
+            body { padding-bottom: 24px; }
+            header { top: 0 !important; padding: max(6px, env(safe-area-inset-top)) 8px 0 !important; }
+            header > .hardware-chassis {
+                display: grid; grid-template-columns: minmax(0, 1fr) auto;
+                gap: 8px; padding: 10px 12px 8px; border-radius: 20px;
+                box-shadow: 0 4px 16px #122b7420, 0 4px 0 #d5c8b3;
+            }
+            .mobile-brand { min-width: 0; gap: 8px; }
+            .mobile-brand > div:first-child { width: 30px; height: 30px; border-radius: 10px; font-size: 14px; flex-shrink: 0; }
+            .mobile-brand > div + div { margin-left: 0 !important; min-width: 0; }
+            .mobile-brand .font-black { font-size: 13px; white-space: nowrap; }
+            .mobile-brand .inline-flex, .mobile-brand p { display: none; }
+            .mobile-controls { grid-column: 2; grid-row: 1; gap: 6px; }
+            .mobile-controls > button { margin-left: 0 !important; min-height: 36px; padding: 6px 8px; font-size: 11px; border-bottom-width: 2px; }
+            #sound-label { display: none; }
+            #sound-btn { min-width: 36px; justify-content: center; }
+            #deck-nav {
+                grid-column: 1 / -1; grid-row: 2; flex-wrap: nowrap; overflow-x: auto;
+                gap: 6px; padding: 2px 0 5px; scrollbar-width: none;
+                scroll-snap-type: x proximity; overscroll-behavior-x: contain;
+            }
+            #deck-nav::-webkit-scrollbar { display: none; }
+            #deck-nav button { flex-shrink: 0; min-height: 42px; padding: 8px 10px; font-size: 11px; scroll-snap-align: start; border-bottom-width: 3px; }
+            main { padding: 18px 10px 0 !important; }
+            .deck-panel { min-width: 0; gap: 24px !important; }
+            main > .deck-panel + .deck-panel { margin-top: 24px !important; }
+            .deck-panel .hardware-chassis { border-radius: 24px; padding: 16px !important; }
+            .deck-panel .white-device-card { border-radius: 24px; padding: 16px !important; }
+            .console-top { gap: 10px; margin-bottom: 16px; }
+            .console-top .oled-screen { padding: 14px; min-height: 150px; border-radius: 18px; }
+            #oled-title { font-size: 18px; line-height: 1.45; }
+            #oled-desc { line-height: 1.6; }
+            #oled-tag { font-size: 10px; }
+            #oled-role-indicator { font-size: 10px; }
+            #oled-code, #oled-counter { white-space: nowrap; font-size: 11px; }
+            #oled-metric { font-size: 10px; text-align: center; padding: 0 6px; }
+            .console-role { width: 100%; align-self: stretch; flex-direction: row; justify-content: flex-end; gap: 10px; }
+            .rotary-housing { width: 44px; height: 44px; }
+            .rotary-ring { width: 36px; height: 36px; border-width: 2px; }
+            .rotary-ring svg { width: 22px; height: 22px; }
+            #hero-keypad { gap: 10px; padding: 9px; border-radius: 20px; }
+            #hero-keypad .keycap { min-width: 0; min-height: 108px; padding: 9px 7px; border-radius: 14px; }
+            #hero-keypad .keycap::before { border-radius: 10px; inset: 4px 4px 7px; }
+            #hero-keypad .keycap > div:first-child { font-size: 9px; }
+            #hero-keypad .keycap .text-3xl { font-size: 25px; }
+            #hero-keypad .keycap .text-4xl { font-size: 28px; }
+            #hero-keypad .keycap .text-\[11px\] { font-size: 10px; }
+            #hero-keypad .keycap > div:last-child { font-size: 9px; line-height: 1.45; overflow-wrap: anywhere; }
+            .record-viewfinder { min-width: 54px; height: 26px; font-size: 14px; gap: 5px; }
+            .record-dot { width: 6px; height: 6px; }
+            h2 { font-size: 21px !important; line-height: 1.5 !important; }
+            h3 { line-height: 1.5 !important; }
+            #industry-grid { padding: 10px; gap: 14px; }
+            #industry-grid .keycap { min-height: 150px; }
+            #calendar-grid { gap: 10px; padding: 10px; }
+            #fde-pipeline { gap: 10px; }
+            #deck-5 > div:first-child { gap: 12px; }
+            #deck-5 > div:first-child button { min-height: 44px; padding: 8px 10px; font-size: 11px; }
+            input[type=text], input[type=number], textarea, select { font-size: 16px !important; min-height: 44px; }
+            input[type=range] { min-height: 18px; margin: 10px 0; touch-action: pan-y; }
+            #val-light-pilots, #val-fde-diag, #val-fde-pilots { flex-shrink: 0; white-space: nowrap; align-self: flex-start; margin-left: 8px; }
+            #fin-status-badge { max-width: 52%; text-align: right; }
+            #deck-4 .oled-screen { padding: 16px; }
+            #decision-checklist input { min-width: 20px; min-height: 20px; }
+            #decision-checklist label { min-height: 48px; }
+            .diorama-pill { padding: 12px 14px; min-height: 60px; }
+            footer { padding: 0 14px !important; margin-top: 24px !important; line-height: 1.7; }
+        }
     </style>
 </head>
 <body class="antialiased selection:bg-blue-600 selection:text-white min-h-screen flex flex-col justify-between pb-12">
@@ -390,7 +462,7 @@
     <header class="sticky top-4 z-50 max-w-6xl w-full mx-auto px-4 sm:px-6">
         <div class="hardware-chassis px-5 py-3.5 flex flex-wrap items-center justify-between gap-4">
             <!-- Brand & LED Status -->
-            <div class="flex items-center space-x-3.5">
+            <div class="mobile-brand flex items-center space-x-3.5">
                 <div class="w-11 h-11 rounded-2xl bg-[#18181B] flex items-center justify-center text-[#22C55E] font-pixel text-2xl shadow-inner border-2 border-stone-700">
                     M_2.1
                 </div>
@@ -416,7 +488,7 @@
             </nav>
 
             <!-- Sound & View All Toggle -->
-            <div class="flex items-center space-x-2">
+            <div class="mobile-controls flex items-center space-x-2">
                 <button onclick="toggleAllDecks()" id="all-decks-btn" class="px-3 py-2 rounded-xl bg-stone-200 text-stone-800 text-xs font-extrabold border-b-4 border-stone-400 active:translate-y-0.5 transition" title="切换单屏专注 / 全景长图">
                     <span id="all-decks-label">展开长图</span>
                 </button>
@@ -444,7 +516,7 @@
 
                 <div class="hardware-chassis p-6 sm:p-9 relative">
                     <!-- Top Row: OLED Dot-Matrix Screen + Rotary Encoder Knob -->
-                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-6 mb-7">
+                    <div class="console-top flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-6 mb-7">
                         <!-- OLED Display -->
                         <div class="oled-screen flex-1 p-5 sm:p-6 min-h-[160px] flex flex-col justify-between">
                             <div class="flex items-center justify-between text-xs font-pixel text-stone-400 border-b border-stone-800 pb-2">
@@ -467,7 +539,7 @@
                         </div>
 
                         <!-- Right Side Rotary Knob + Green Status LED -->
-                        <div class="flex sm:flex-col items-center justify-between sm:justify-center gap-3 shrink-0 self-center">
+                        <div class="console-role flex sm:flex-col items-center justify-between sm:justify-center gap-3 shrink-0 self-center">
                             <div onclick="rotateRoleKnob()" id="macro-knob" class="rotary-housing group" title="点击旋转切换角色视角">
                                 <div class="rotary-ring">
                                     <svg class="w-11 h-11 text-zinc-900 group-hover:scale-105 transition" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
@@ -1958,6 +2030,11 @@
                 }
                 btn.textContent = labels[idx];
             });
+            if (window.matchMedia('(max-width: 639px)').matches) {
+                const nav = document.getElementById('deck-nav');
+                const active = document.getElementById('nav-' + deckId);
+                nav.scrollTo({ left: active.offsetLeft - nav.offsetLeft - 8, behavior: 'smooth' });
+            }
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
