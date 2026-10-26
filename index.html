@@ -1496,8 +1496,8 @@
 
         function renderAgendaSteps() {
             const data = agendas[currentAgendaType];
-            document.getElementById('agenda-title').textContent = data.title;
-            document.getElementById('agenda-subtitle').textContent = data.subtitle;
+            if (document.getElementById('agenda-title')) document.getElementById('agenda-title').textContent = data.title;
+            if (document.getElementById('agenda-subtitle')) document.getElementById('agenda-subtitle').textContent = data.subtitle;
             document.getElementById('agenda-steps').innerHTML = data.steps.map((s, idx) => `
                 <div onclick="highlightAgendaStep(${idx})" class="p-3 rounded-2xl cursor-pointer transition flex items-center justify-between gap-3 ${idx === activeAgendaStep ? 'bg-[#FFEB14] border-2 border-zinc-900 shadow-md scale-[1.01]' : 'bg-white border-2 border-stone-200 hover:border-blue-400'}">
                     <div>
