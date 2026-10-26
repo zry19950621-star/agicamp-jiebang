@@ -345,6 +345,43 @@
         .deck-panel {
             animation: deckFadeIn 0.28s cubic-bezier(0.22, 1, 0.36, 1);
         }
+
+        .record-viewfinder {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            min-width: 70px;
+            height: 32px;
+            color: #fff;
+            background: #202124;
+            border: 1px solid #48494d;
+            border-radius: 6px;
+            box-shadow: inset 0 2px 5px #0008, 0 1px 0 #fff;
+            font: 700 16px/1 'VT323', monospace;
+            letter-spacing: 1px;
+        }
+        .record-viewfinder::before, .record-viewfinder::after {
+            content: '';
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-color: #6b7280;
+            border-style: solid;
+        }
+        .record-viewfinder::before { left: -5px; top: -5px; border-width: 2px 0 0 2px; }
+        .record-viewfinder::after { right: -5px; bottom: -5px; border-width: 0 2px 2px 0; }
+        .record-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #ff3b30;
+            box-shadow: 0 0 6px #ff3b3080;
+            animation: recording-blink 1.6s ease-in-out infinite;
+        }
+        @keyframes recording-blink { 0%, 100% { opacity: 1; } 50% { opacity: .3; } }
+        @media (prefers-reduced-motion: reduce) { .record-dot { animation: none; } }
     </style>
 </head>
 <body class="antialiased selection:bg-blue-600 selection:text-white min-h-screen flex flex-col justify-between pb-12">
@@ -1019,7 +1056,7 @@
                 code: "P6",
                 style: "key-white",
                 topTag: "KEY_6",
-                centerHtml: `<div class="my-auto flex flex-col items-center"><span class="w-7 h-7 rounded-full bg-red-600 inline-block shadow-inner"></span><span class="text-[11px] font-extrabold text-red-600 mt-1.5">MLJB 001</span></div>`,
+                centerHtml: `<div class="my-auto flex flex-col items-center"><span class="record-viewfinder" aria-label="录像中"><span class="record-dot"></span><span>REC</span></span><span class="text-[11px] font-extrabold text-red-600 mt-1.5">MLJB 001</span></div>`,
                 bottomLabel: "出海首期标杆",
                 oledTitle: "PILOT 001 // 出海电商多语言本地化验证",
                 oledDesc: "1个品类×2个市场×60条样本×3周：验证合格稿人工时间减少30%，价格规格准确率≥98%。",
